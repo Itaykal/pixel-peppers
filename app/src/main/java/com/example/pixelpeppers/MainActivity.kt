@@ -40,6 +40,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.example.pixelpeppers.ui.theme.PixelPeppersTheme
+import com.example.pixelpeppers.ui.components.PixelPeppersButton
+import com.example.pixelpeppers.ui.components.PageIndicator
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,51 +62,14 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Onboarding1(modifier: Modifier = Modifier) {
-    Box(
+    Box(contentAlignment = Alignment.TopCenter,
         modifier = modifier
             .requiredWidth(width = 393.dp)
             .requiredHeight(height = 852.dp)
             .background(color = Color(0xff121011))
     ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .align(alignment = Alignment.TopCenter)
-                .offset(x = (-0.5).dp,
-                    y = 711.dp)
-                .requiredWidth(width = 340.dp)
-                .clip(shape = RoundedCornerShape(16.dp))
-                .background(color = Color(0xff3d7151))
-                .padding(horizontal = 10.dp,
-                    vertical = 13.dp)
-        ) {
-            Text(
-                text = "Next",
-                color = Color.White,
-                style = TextStyle(
-                    fontSize = 18.sp))
-        }
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(5.dp, Alignment.Start),
-            modifier = Modifier
-                .align(alignment = Alignment.TopCenter)
-                .offset(x = (-0.5).dp,
-                    y = 785.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .requiredWidth(width = 52.dp)
-                    .requiredHeight(height = 4.dp)
-                    .clip(shape = RoundedCornerShape(2.dp))
-                    .background(color = Color(0xff3d7151)))
-            Box(
-                modifier = Modifier
-                    .requiredWidth(width = 52.dp)
-                    .requiredHeight(height = 4.dp)
-                    .clip(shape = RoundedCornerShape(2.dp))
-                    .background(color = Color(0xff1e1e1e)))
-        }
+        PixelPeppersButton(text = "Next") {}
+        PageIndicator(totalPages = 2, currentPage = 0)
         Text(
             text = "Tell us about your\nfavorite games",
             color = Color.White,
@@ -113,15 +79,19 @@ fun Onboarding1(modifier: Modifier = Modifier) {
                 fontWeight = FontWeight.Medium),
             modifier = Modifier
                 .align(alignment = Alignment.TopCenter)
-                .offset(x = 0.dp,
-                    y = 597.dp))
+                .offset(
+                    x = 0.dp,
+                    y = 597.dp
+                ))
         Image(
             painter = painterResource(id = androidx.core.R.drawable.notify_panel_notification_icon_bg),
             contentDescription = "hero_capsule 1",
             modifier = Modifier
                 .align(alignment = Alignment.TopStart)
-                .offset(x = 312.dp,
-                    y = 317.dp)
+                .offset(
+                    x = 312.dp,
+                    y = 317.dp
+                )
                 .requiredWidth(width = 133.dp)
                 .requiredHeight(height = 182.dp)
                 .clip(shape = RoundedCornerShape(8.dp)))
@@ -130,8 +100,10 @@ fun Onboarding1(modifier: Modifier = Modifier) {
             contentDescription = "Logo_of_Stardew_Valley",
             modifier = Modifier
                 .align(alignment = Alignment.TopStart)
-                .offset(x = (-52).dp,
-                    y = 124.dp)
+                .offset(
+                    x = (-52).dp,
+                    y = 124.dp
+                )
                 .requiredWidth(width = 133.dp)
                 .requiredHeight(height = 182.dp)
                 .clip(shape = RoundedCornerShape(8.dp)))
@@ -140,8 +112,10 @@ fun Onboarding1(modifier: Modifier = Modifier) {
             contentDescription = "60eca3ac155247e21850c7d075d01ebf0f3f5dbf19ccd2a1",
             modifier = Modifier
                 .align(alignment = Alignment.TopStart)
-                .offset(x = 100.dp,
-                    y = 124.dp)
+                .offset(
+                    x = 100.dp,
+                    y = 124.dp
+                )
                 .requiredWidth(width = 133.dp)
                 .requiredHeight(height = 182.dp)
                 .clip(shape = RoundedCornerShape(8.dp)))
@@ -150,8 +124,10 @@ fun Onboarding1(modifier: Modifier = Modifier) {
             contentDescription = "World_of_Warcraft",
             modifier = Modifier
                 .align(alignment = Alignment.TopStart)
-                .offset(x = 251.dp,
-                    y = 124.dp)
+                .offset(
+                    x = 251.dp,
+                    y = 124.dp
+                )
                 .requiredWidth(width = 133.dp)
                 .requiredHeight(height = 182.dp)
                 .clip(shape = RoundedCornerShape(8.dp)))
@@ -160,8 +136,10 @@ fun Onboarding1(modifier: Modifier = Modifier) {
             contentDescription = "due3Vp0T2VSGfBtGsWjVnrL4o882iYVk",
             modifier = Modifier
                 .align(alignment = Alignment.TopStart)
-                .offset(x = 10.dp,
-                    y = 317.dp)
+                .offset(
+                    x = 10.dp,
+                    y = 317.dp
+                )
                 .requiredWidth(width = 133.dp)
                 .requiredHeight(height = 182.dp)
                 .clip(shape = RoundedCornerShape(8.dp)))
@@ -170,8 +148,10 @@ fun Onboarding1(modifier: Modifier = Modifier) {
             contentDescription = "MV5BMzNkMmE5MjktMzRhYS00MzZhLWEzYzMtMWFkYmE4MDk0NDZkXkEyXkFqcGdeQXVyMTk2OTAzNTI@",
             modifier = Modifier
                 .align(alignment = Alignment.TopStart)
-                .offset(x = 161.dp,
-                    y = 317.dp)
+                .offset(
+                    x = 161.dp,
+                    y = 317.dp
+                )
                 .requiredWidth(width = 133.dp)
                 .requiredHeight(height = 182.dp)
                 .clip(shape = RoundedCornerShape(8.dp)))
@@ -183,8 +163,10 @@ fun Onboarding1(modifier: Modifier = Modifier) {
                 fontSize = 16.sp),
             modifier = Modifier
                 .align(alignment = Alignment.TopStart)
-                .offset(x = 342.dp,
-                    y = 59.dp))
+                .offset(
+                    x = 342.dp,
+                    y = 59.dp
+                ))
     }
 }
 
