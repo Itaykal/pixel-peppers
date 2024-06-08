@@ -1,8 +1,12 @@
 package com.example.pixelpeppers.ui.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
@@ -24,8 +28,15 @@ import androidx.compose.ui.unit.sp
 import androidx.core.R
 import androidx.navigation.NavController
 import com.example.pixelpeppers.Route
+import com.example.pixelpeppers.ui.components.GenreTag
 import com.example.pixelpeppers.ui.components.PageIndicator
 import com.example.pixelpeppers.ui.components.PixelPeppersButton
+
+var OnboardingTagValues = listOf<String>(
+    "Action", "Adventure", "Indie", "Rouge Like", "Shooter", "RPG", "Strategy", "Sports", "Puzzle",
+    "MMO", "Rhythm", "Card", "Horror", "Gacha", "Sandbox"
+)
+
 
 @Composable
 fun Onboarding(
@@ -34,7 +45,8 @@ fun Onboarding(
     navController: NavController,
 ) {
     Scaffold(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
             .padding(0.dp)
     ) { paddingValues ->
         Box(contentAlignment = Alignment.TopCenter,
@@ -51,13 +63,15 @@ fun Onboarding(
             if (page == 0) {
                 OnboardingIntro(
                     navController = navController,
-                    modifier = modifier.padding(paddingValues)
+                    modifier = modifier
+                        .padding(paddingValues)
                         .fillMaxSize(),
                 )
             } else if (page == 1) {
                 OnboardingTags(
                     navController = navController,
-                    modifier = modifier.padding(paddingValues)
+                    modifier = modifier
+                        .padding(paddingValues)
                         .fillMaxSize(),
                 )
             }
@@ -70,11 +84,11 @@ fun OnboardingTags(
     navController: NavController,
     modifier: Modifier = Modifier,
 ) {
-    Box(contentAlignment = Alignment.TopCenter,
+    Box(contentAlignment = Alignment.Center,
         modifier = modifier
     ) {
         Text(
-            text = "We love fortnite we love fortnite",
+            text = "Select the genres you\nlike to play",
             color = Color.White,
             textAlign = TextAlign.Center,
             style = TextStyle(
@@ -86,6 +100,29 @@ fun OnboardingTags(
                     x = 0.dp,
                     y = 597.dp
                 ))
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = modifier
+                .offset(y = 280.dp)
+        ) {
+            repeat(times = 4) { rowIndex ->
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterHorizontally),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth() // Ensures the row takes up the full width
+                ) {
+                    repeat(times = 5) { columnIndex ->
+                        val index = rowIndex * 5 + columnIndex
+                        if (index < OnboardingTagValues.size) {
+                            GenreTag(
+                                text = OnboardingTagValues[index],
+                                modifier = Modifier.padding(horizontal = 288.dp) // Adds spacing between tags
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
