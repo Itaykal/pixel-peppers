@@ -23,16 +23,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             PixelPeppersTheme {
                 NavGraph(startDestination = Route.OnboardingIntro.route)
-            //                Scaffold(
-//                    modifier = Modifier.fillMaxSize()
-//                        .padding(0.dp)
-//                ) { paddingValues ->
-//                    Onboarding(
-//                        event = OnboardingViewModel()::onEvent,
-//                        modifier = Modifier.padding(paddingValues)
-//                            .fillMaxSize()
-//                    )
-//                }
             }
         }
     }

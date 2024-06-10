@@ -84,6 +84,9 @@ fun OnboardingTags(
     navController: NavController,
     modifier: Modifier = Modifier,
 ) {
+    var rows = 4
+    var columns = 4
+
     Box(contentAlignment = Alignment.Center,
         modifier = modifier
     ) {
@@ -101,22 +104,21 @@ fun OnboardingTags(
                     y = 597.dp
                 ))
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(-8.dp),
             modifier = modifier
                 .offset(y = 280.dp)
         ) {
-            repeat(times = 4) { rowIndex ->
+            repeat(times = rows) { rowIndex ->
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterHorizontally),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth() // Ensures the row takes up the full width
                 ) {
-                    repeat(times = 5) { columnIndex ->
-                        val index = rowIndex * 5 + columnIndex
+                    repeat(times = columns) { columnIndex ->
+                        val index = rowIndex * 4 + columnIndex
                         if (index < OnboardingTagValues.size) {
                             GenreTag(
                                 text = OnboardingTagValues[index],
-                                modifier = Modifier.padding(horizontal = 288.dp) // Adds spacing between tags
                             )
                         }
                     }
@@ -132,7 +134,7 @@ fun OnboardingIntro(
     modifier: Modifier = Modifier,
 ) {
     Box(contentAlignment = Alignment.TopCenter,
-        modifier = modifier
+        modifier = modifier,
     ) {
         Text(
             text = "Tell us about your\nfavorite games",

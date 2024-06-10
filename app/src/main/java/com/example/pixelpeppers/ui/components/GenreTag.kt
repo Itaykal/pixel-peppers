@@ -39,9 +39,12 @@ fun GenreTag(
                     fontWeight = FontWeight.Medium)
             )
         },
-        shape = MaterialTheme.shapes.small,
+        shape = MaterialTheme.shapes.extraSmall,
         colors = FilterChipDefaults.filterChipColors(
             containerColor = inactiveColor,
+        ),
+        border =  FilterChipDefaults.filterChipBorder(
+            borderColor = inactiveColor
         )
     )
 }
