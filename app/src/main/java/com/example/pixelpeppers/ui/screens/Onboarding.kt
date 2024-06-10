@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.pixelpeppers.Route
+import com.example.pixelpeppers.ui.components.GameCarousell
 import com.example.pixelpeppers.ui.components.GenreTag
 import com.example.pixelpeppers.ui.components.PageIndicator
 import com.example.pixelpeppers.ui.components.PixelPeppersButton
@@ -30,6 +32,8 @@ var OnboardingTagValues = listOf<String>(
     "Action", "Adventure", "Indie", "Rouge Like", "Shooter", "RPG", "Strategy", "Sports", "Puzzle",
     "MMO", "Rhythm", "Card", "Horror", "Gacha", "Sandbox"
 )
+var gameCoversTop = listOf<String>("co79vq", "xrpmydnu9rpxvxfjkiu7", "co2l7z")
+var gameCoversBottom = listOf<String>("co1nh1", "co39vc", "co4b39")
 
 @Composable
 fun Onboarding(
@@ -142,77 +146,23 @@ fun OnboardingIntro(
                     x = 0.dp,
                     y = 597.dp
                 ))
-//        Image(
-//            painter = painterResource(id = R.drawable.notify_panel_notification_icon_bg),
-//            contentDescription = "hero_capsule 1",
-//            modifier = Modifier
-//                .align(alignment = Alignment.TopStart)
-//                .offset(
-//                    x = 312.dp,
-//                    y = 317.dp
-//                )
-//                .requiredWidth(width = 133.dp)
-//                .requiredHeight(height = 182.dp)
-//                .clip(shape = RoundedCornerShape(8.dp)))
-//        Image(
-//            painter = painterResource(id = R.drawable.notify_panel_notification_icon_bg),
-//            contentDescription = "Logo_of_Stardew_Valley",
-//            modifier = Modifier
-//                .align(alignment = Alignment.TopStart)
-//                .offset(
-//                    x = (-52).dp,
-//                    y = 124.dp
-//                )
-//                .requiredWidth(width = 133.dp)
-//                .requiredHeight(height = 182.dp)
-//                .clip(shape = RoundedCornerShape(8.dp)))
-//        Image(
-//            painter = painterResource(id = R.drawable.notify_panel_notification_icon_bg),
-//            contentDescription = "60eca3ac155247e21850c7d075d01ebf0f3f5dbf19ccd2a1",
-//            modifier = Modifier
-//                .align(alignment = Alignment.TopStart)
-//                .offset(
-//                    x = 100.dp,
-//                    y = 124.dp
-//                )
-//                .requiredWidth(width = 133.dp)
-//                .requiredHeight(height = 182.dp)
-//                .clip(shape = RoundedCornerShape(8.dp)))
-//        Image(
-//            painter = painterResource(id = R.drawable.notify_panel_notification_icon_bg),
-//            contentDescription = "World_of_Warcraft",
-//            modifier = Modifier
-//                .align(alignment = Alignment.TopStart)
-//                .offset(
-//                    x = 251.dp,
-//                    y = 124.dp
-//                )
-//                .requiredWidth(width = 133.dp)
-//                .requiredHeight(height = 182.dp)
-//                .clip(shape = RoundedCornerShape(8.dp)))
-//        Image(
-//            painter = painterResource(id = R.drawable.notify_panel_notification_icon_bg),
-//            contentDescription = "due3Vp0T2VSGfBtGsWjVnrL4o882iYVk",
-//            modifier = Modifier
-//                .align(alignment = Alignment.TopStart)
-//                .offset(
-//                    x = 10.dp,
-//                    y = 317.dp
-//                )
-//                .requiredWidth(width = 133.dp)
-//                .requiredHeight(height = 182.dp)
-//                .clip(shape = RoundedCornerShape(8.dp)))
-//        Image(
-//            painter = painterResource(id = R.drawable.notify_panel_notification_icon_bg),
-//            contentDescription = "MV5BMzNkMmE5MjktMzRhYS00MzZhLWEzYzMtMWFkYmE4MDk0NDZkXkEyXkFqcGdeQXVyMTk2OTAzNTI@",
-//            modifier = Modifier
-//                .align(alignment = Alignment.TopStart)
-//                .offset(
-//                    x = 161.dp,
-//                    y = 317.dp
-//                )
-//                .requiredWidth(width = 133.dp)
-//                .requiredHeight(height = 182.dp)
-//                .clip(shape = RoundedCornerShape(8.dp)))
+        Column(
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier
+                .height(500.dp)
+                .align(Alignment.TopCenter)
+                .offset(y = 150.dp)
+        ) {
+            GameCarousell(
+                artworkIDs = gameCoversTop,
+                titleOn = false,
+                userScrollEnabled = false,
+            )
+            GameCarousell(
+                artworkIDs = gameCoversBottom,
+                titleOn = false,
+                userScrollEnabled = false,
+            )
+        }
     }
 }

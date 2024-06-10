@@ -4,8 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -20,21 +19,23 @@ fun GameCarousell(
     artworkIDs: List<String>,
     titleOn: Boolean = true,
     userScrollEnabled: Boolean = true,
-    modifier: Modifier,
+//    imageHeight: Dp?
+    modifier: Modifier = Modifier,
 ) {
     val state = rememberLazyListState()
     Box (
-        modifier = Modifier
+        modifier = modifier
             .background(MaterialTheme.colorScheme.background)
-            .fillMaxSize()
+            .height(230.dp)
     ) {
         LazyRow (
             state = state,
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.CenterVertically,
             userScrollEnabled = userScrollEnabled,
             contentPadding = PaddingValues(horizontal = 0.dp, vertical = 10.dp),
-            modifier = Modifier
-                .fillMaxHeight()
+            modifier = modifier
+                .height(230.dp)
         ) {
             itemsIndexed(artworkIDs) {_, artwork ->
                 GamePreview(
