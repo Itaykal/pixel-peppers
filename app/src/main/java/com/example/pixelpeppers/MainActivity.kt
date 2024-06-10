@@ -11,7 +11,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        var splashScreen = installSplashScreen()
+        installSplashScreen()
         setContent {
             PixelPeppersTheme {
                 NavGraph(startDestination = Route.OnboardingIntro.route)
