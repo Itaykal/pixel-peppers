@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.pixelpeppers.ui.screens.Onboarding
+import com.example.pixelpeppers.ui.screens.TempPage
 
 @Composable
 fun NavGraph(
@@ -22,6 +23,11 @@ fun NavGraph(
             route = Route.OnboardingTags.route
         ){
             Onboarding(page = 1, navController = navController)
+        }
+        composable(
+            route = Route.Login.route
+        ) {
+            TempPage()
         }
     }
 }
