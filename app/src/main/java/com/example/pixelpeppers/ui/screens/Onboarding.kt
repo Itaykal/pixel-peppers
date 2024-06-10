@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -163,7 +165,9 @@ fun OnboardingIntro(
                 titleOn = false,
                 userScrollEnabled = false,
                 modifier = Modifier
-                    .offset(y = -20.dp)
+                    .offset(x = (-15).dp, y = (-20).dp)
+                    .wrapContentWidth(unbounded = true)
+                    .width(600.dp)
             )
         }
     }
