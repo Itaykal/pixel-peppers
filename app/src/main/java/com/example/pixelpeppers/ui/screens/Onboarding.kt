@@ -162,6 +162,8 @@ fun OnboardingIntro(
                 artworkIDs = gameCoversBottom,
                 titleOn = false,
                 userScrollEnabled = false,
+                modifier = Modifier
+                    .offset(y = -20.dp)
             )
         }
     }
