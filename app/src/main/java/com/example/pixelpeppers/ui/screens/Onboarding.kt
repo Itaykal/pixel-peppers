@@ -32,11 +32,11 @@ import com.example.pixelpeppers.ui.components.GenreTag
 import com.example.pixelpeppers.ui.components.PageIndicator
 import com.example.pixelpeppers.ui.components.PixelPeppersButton
 
+
 var OnboardingTagValues = listOf<String>(
     "Action", "Adventure", "Indie", "Rouge Like", "Shooter", "RPG", "Strategy", "Sports", "Puzzle",
     "MMO", "Rhythm", "Card", "Horror", "Gacha", "Sandbox"
 )
-
 
 @Composable
 fun Onboarding(
