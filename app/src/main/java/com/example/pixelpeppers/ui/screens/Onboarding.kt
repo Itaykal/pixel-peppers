@@ -1,5 +1,6 @@
 package com.example.pixelpeppers.ui.screens
 
+import LoadingAnimation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -112,13 +113,15 @@ fun OnboardingTags(
             loading.value = false
         }
     }
+
+
     if (loading.value) {
         Box (
             contentAlignment = Alignment.Center,
             modifier = modifier
         ) {
             // TODO: Add loader here
-            Text(text = "Loading...")
+            LoadingAnimation()
         }
     } else {
         Box(
