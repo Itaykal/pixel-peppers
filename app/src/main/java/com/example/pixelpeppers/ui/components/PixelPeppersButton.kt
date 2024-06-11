@@ -21,7 +21,7 @@ import androidx.compose.ui.text.TextStyle
 @Composable
 fun PixelPeppersButton(
     text: String,
-    onClick: () -> Unit
+    onClick: () -> Unit = {}
 ) {
 //    var isPressed by remember { mutableStateOf(false) }
 //
