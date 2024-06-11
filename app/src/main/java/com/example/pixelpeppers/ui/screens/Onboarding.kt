@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.pixelpeppers.Route
+import com.example.pixelpeppers.models.Cover
 import com.example.pixelpeppers.models.Game
 import com.example.pixelpeppers.models.Genre
 import com.example.pixelpeppers.repositories.GamesRepository
@@ -44,7 +45,7 @@ var OnboardingTagValues = listOf<String>(
 var g = Game(
     id = 17000,
     name = "Stardew Valley",
-    posterURL = "https://images.igdb.com/igdb/image/upload/t_cover_big/xrpmydnu9rpxvxfjkiu7.jpeg",
+    cover = Cover("//images.igdb.com/igdb/image/upload/t_cover_big/xrpmydnu9rpxvxfjkiu7.jpeg"),
     genres = listOf<Genre>(Genre("Indie"), Genre("Farming"))
 )
 //var gameCoversTop = listOf<String>("co79vq", "xrpmydnu9rpxvxfjkiu7", "co2l7z")
@@ -67,7 +68,9 @@ fun Onboarding(
             modifier = modifier
         ) {
             PageIndicator(totalPages = 2, currentPage = page)
-            PixelPeppersButton(text = "Next", onClick = {
+            PixelPeppersButton(
+                text = "Next",
+                onClick = {
                 if (page == 0) {
                     navController.navigate(route = Route.OnboardingTags.route)
                 } else {
@@ -81,78 +84,83 @@ fun Onboarding(
                         .fillMaxSize(),
                 )
             } else if (page == 1) {
-                val genres = remember { mutableStateListOf<Genre>() }
-                val loading = remember { mutableStateOf(true) }
-                LaunchedEffect(Unit) {
-                    GamesRepository.getGenres {
-                        genres.addAll(it)
-                        loading.value = false
-                    }
-                }
-                if (loading.value) {
-                    // TODO: Add loader here
-                    Text(text = "Loading...")
-                } else {
-                    OnboardingTags(
-                        modifier = modifier
-                            .padding(paddingValues)
-                            .fillMaxSize(),
-                        onboardingTagValues = genres,
-                    )
-                }
+                OnboardingTags(
+                    modifier = modifier
+                        .padding(paddingValues)
+                        .fillMaxSize()
+                )
             }
         }
     }
-
 }
+
+
 
 @Composable
 fun OnboardingTags(
     modifier: Modifier = Modifier,
-    onboardingTagValues: List<Genre>
 ) {
-    val rows = 4
-    val columns = 4
+    val rows = 7
+    val columns = 3
 
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
-    ) {
-        Text(
-            text = "Select the genres you\nlike to play",
-            color = Color.White,
-            textAlign = TextAlign.Center,
-            style = TextStyle(
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Medium
-            ),
-            modifier = Modifier
-                .align(alignment = Alignment.TopCenter)
-                .offset(
-                    x = 0.dp,
-                    y = 597.dp
-                )
-        )
-        Column(
-            verticalArrangement = Arrangement.spacedBy(-8.dp),
+    val genres = remember { mutableStateListOf<Genre>() }
+    val loading = remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        GamesRepository.getGenres (limit = rows * columns) {
+            genres.addAll(it)
+            loading.value = false
+        }
+    }
+    if (loading.value) {
+        Box (
+            contentAlignment = Alignment.Center,
             modifier = modifier
-                .offset(y = 280.dp)
         ) {
-            repeat(times = rows) { rowIndex ->
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(
-                        8.dp,
-                        Alignment.CenterHorizontally
-                    ),
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth() // Ensures the row takes up the full width
-                ) {
-                    repeat(times = columns) { columnIndex ->
-                        val index = rowIndex * 4 + columnIndex
-                        if (index < onboardingTagValues.size) {
-                            GenreTag(
-                                text = onboardingTagValues[index].name,
-                            )
+            // TODO: Add loader here
+            Text(text = "Loading...")
+        }
+    } else {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = modifier
+        ) {
+            Text(
+                text = "Select the genres you\nlike to play",
+                color = Color.White,
+                textAlign = TextAlign.Center,
+                style = TextStyle(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium
+                ),
+                modifier = Modifier
+                    .align(alignment = Alignment.TopCenter)
+                    .offset(
+                        x = 0.dp,
+                        y = 597.dp
+                    )
+            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(-8.dp),
+                modifier = modifier
+                    .offset(y = 280.dp)
+            ) {
+                repeat(times = rows) { rowIndex ->
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(
+                            8.dp,
+                            Alignment.CenterHorizontally
+                        ),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth() // Ensures the row takes up the full width
+                    ) {
+                        repeat(times = columns) { columnIndex ->
+                            val index = rowIndex * 4 + columnIndex
+                            if (index < genres.size) {
+                                GenreTag(
+                                    text = genres[index].name,
+                                )
+                            }
                         }
                     }
                 }
@@ -160,6 +168,7 @@ fun OnboardingTags(
         }
     }
 }
+
 
 @Composable
 fun OnboardingIntro(

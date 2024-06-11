@@ -47,7 +47,7 @@ fun GamePreview(
             .clip(shape= MaterialTheme.shapes.extraLarge)
     ) {
         GlideImage(
-            model = game.posterURL,
+            model = "https:${game.cover.url.replace("t_thumb", "t_cover_big")}",
             contentDescription = game.name,
             loading = placeholder(R.drawable.avd_anim_placeholder),
             transition = CrossFade,
