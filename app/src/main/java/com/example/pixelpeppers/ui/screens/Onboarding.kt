@@ -14,6 +14,10 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,6 +30,7 @@ import androidx.navigation.NavController
 import com.example.pixelpeppers.Route
 import com.example.pixelpeppers.models.Game
 import com.example.pixelpeppers.models.Genre
+import com.example.pixelpeppers.repositories.GamesRepository
 import com.example.pixelpeppers.ui.components.GameCarousell
 import com.example.pixelpeppers.ui.components.GenreTag
 import com.example.pixelpeppers.ui.components.PageIndicator
@@ -45,6 +50,7 @@ var g = Game(
 //var gameCoversTop = listOf<String>("co79vq", "xrpmydnu9rpxvxfjkiu7", "co2l7z")
 //var gameCoversBottom = listOf<String>("co1nh1", "co39vc", "co4b39")
 
+
 @Composable
 fun Onboarding(
     modifier: Modifier = Modifier,
@@ -56,7 +62,8 @@ fun Onboarding(
             .fillMaxSize()
             .padding(0.dp)
     ) { paddingValues ->
-        Box(contentAlignment = Alignment.TopCenter,
+        Box(
+            contentAlignment = Alignment.TopCenter,
             modifier = modifier
         ) {
             PageIndicator(totalPages = 2, currentPage = page)
@@ -69,32 +76,46 @@ fun Onboarding(
             })
             if (page == 0) {
                 OnboardingIntro(
-                    navController = navController,
                     modifier = modifier
                         .padding(paddingValues)
                         .fillMaxSize(),
                 )
             } else if (page == 1) {
-                OnboardingTags(
-                    navController = navController,
-                    modifier = modifier
-                        .padding(paddingValues)
-                        .fillMaxSize(),
-                )
+                val genres = remember { mutableStateListOf<Genre>() }
+                val loading = remember { mutableStateOf(true) }
+                LaunchedEffect(Unit) {
+                    GamesRepository.getGenres {
+                        genres.addAll(it)
+                        loading.value = false
+                    }
+                }
+                if (loading.value) {
+                    // TODO: Add loader here
+                    Text(text = "Loading...")
+                } else {
+                    OnboardingTags(
+                        modifier = modifier
+                            .padding(paddingValues)
+                            .fillMaxSize(),
+                        onboardingTagValues = genres,
+                    )
+                }
             }
         }
     }
 
 }
+
 @Composable
 fun OnboardingTags(
-    navController: NavController,
     modifier: Modifier = Modifier,
+    onboardingTagValues: List<Genre>
 ) {
-    var rows = 4
-    var columns = 4
+    val rows = 4
+    val columns = 4
 
-    Box(contentAlignment = Alignment.Center,
+    Box(
+        contentAlignment = Alignment.Center,
         modifier = modifier
     ) {
         Text(
@@ -103,13 +124,15 @@ fun OnboardingTags(
             textAlign = TextAlign.Center,
             style = TextStyle(
                 fontSize = 20.sp,
-                fontWeight = FontWeight.Medium),
+                fontWeight = FontWeight.Medium
+            ),
             modifier = Modifier
                 .align(alignment = Alignment.TopCenter)
                 .offset(
                     x = 0.dp,
                     y = 597.dp
-                ))
+                )
+        )
         Column(
             verticalArrangement = Arrangement.spacedBy(-8.dp),
             modifier = modifier
@@ -117,15 +140,18 @@ fun OnboardingTags(
         ) {
             repeat(times = rows) { rowIndex ->
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        8.dp,
+                        Alignment.CenterHorizontally
+                    ),
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth() // Ensures the row takes up the full width
                 ) {
                     repeat(times = columns) { columnIndex ->
                         val index = rowIndex * 4 + columnIndex
-                        if (index < OnboardingTagValues.size) {
+                        if (index < onboardingTagValues.size) {
                             GenreTag(
-                                text = OnboardingTagValues[index],
+                                text = onboardingTagValues[index].name,
                             )
                         }
                     }
@@ -137,10 +163,10 @@ fun OnboardingTags(
 
 @Composable
 fun OnboardingIntro(
-    navController: NavController,
     modifier: Modifier = Modifier,
 ) {
-    Box(contentAlignment = Alignment.TopCenter,
+    Box(
+        contentAlignment = Alignment.TopCenter,
         modifier = modifier,
     ) {
         Text(
@@ -149,13 +175,15 @@ fun OnboardingIntro(
             textAlign = TextAlign.Center,
             style = TextStyle(
                 fontSize = 20.sp,
-                fontWeight = FontWeight.Medium),
+                fontWeight = FontWeight.Medium
+            ),
             modifier = Modifier
                 .align(alignment = Alignment.TopCenter)
                 .offset(
                     x = 0.dp,
                     y = 597.dp
-                ))
+                )
+        )
         Column(
             verticalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier

@@ -25,12 +25,4 @@ fun TempPage(
         )
         LargeGamePreview(game = g)
     }
-
-
-//    val artworks: List<String> = listOf<String>(
-//        "co2k2z", "co6xe3", "co5ff7", "co1nic",
-//        "co670h", "co4jni", "co4a7a", "co1n1x",
-//        "co1sfj", "co5vmg", "co5xex"
-//    )
-//    GameCarousell(artworkIDs = artworks, modifier = modifier)
 }

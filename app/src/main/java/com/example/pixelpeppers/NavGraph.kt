@@ -27,7 +27,7 @@ fun NavGraph(
         composable(
             route = Route.Login.route
         ) {
-            TempPage()
+            TempPage(navController = navController)
         }
     }
 }
