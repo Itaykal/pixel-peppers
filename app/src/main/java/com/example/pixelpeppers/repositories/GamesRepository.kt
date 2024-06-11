@@ -46,10 +46,10 @@ object GamesRepository {
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 val response = GamesClient.getGame(gameId)
-                val game: Game = Gson().fromJson(
-                    response.body?.charStream(), object : TypeToken<Game>() {}.type
+                val games: List<Game> = Gson().fromJson(
+                    response.body?.charStream(), object : TypeToken<List<Game>>() {}.type
                 )
-                callback(game)
+                callback(games[0])
             } catch (e: Exception) {
                 // TODO: Handle the error here
                 e.printStackTrace()
