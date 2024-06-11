@@ -32,9 +32,9 @@ const val igdbImageSuffix = ".jpeg"
 fun GamePreview(
     igdbArtworkId: String,
     description: String,
+    modifier: Modifier = Modifier,
     titleOn: Boolean = true,
     title: String = "Placeholder",
-    modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
     Box(
@@ -47,7 +47,7 @@ fun GamePreview(
             contentDescription = description,
             loading = placeholder(R.drawable.avd_anim_placeholder),
             transition = CrossFade,
-            modifier = Modifier
+            modifier = modifier
                 .clickable(onClick = onClick)
                 .height(196.dp)
                 .width(150.dp),

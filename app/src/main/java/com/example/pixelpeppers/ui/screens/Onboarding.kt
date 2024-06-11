@@ -157,13 +157,11 @@ fun OnboardingIntro(
         ) {
             GameCarousell(
                 artworkIDs = gameCoversTop,
-                titleOn = false,
-                userScrollEnabled = false,
+                static = true,
             )
             GameCarousell(
                 artworkIDs = gameCoversBottom,
-                titleOn = false,
-                userScrollEnabled = false,
+                static = true,
                 modifier = Modifier
                     .offset(x = (-15).dp, y = (-20).dp)
                     .wrapContentWidth(unbounded = true)

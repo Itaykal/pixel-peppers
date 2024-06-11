@@ -17,10 +17,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun GameCarousell(
     artworkIDs: List<String>,
-    titleOn: Boolean = true,
-    userScrollEnabled: Boolean = true,
-//    imageHeight: Dp?
     modifier: Modifier = Modifier,
+    static: Boolean = false,
 ) {
     val state = rememberLazyListState()
     Box (
@@ -32,7 +30,7 @@ fun GameCarousell(
             state = state,
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically,
-            userScrollEnabled = userScrollEnabled,
+            userScrollEnabled = !static,
             contentPadding = PaddingValues(horizontal = 0.dp, vertical = 10.dp),
             modifier = modifier
                 .height(230.dp)
@@ -41,7 +39,7 @@ fun GameCarousell(
                 GamePreview(
                     igdbArtworkId = artwork,
                     description = "",
-                    titleOn = titleOn,
+                    titleOn = !static,
                 )
             }
         }
