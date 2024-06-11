@@ -23,7 +23,7 @@ fun TempPage(
             posterURL = "https://images.igdb.com/igdb/image/upload/t_cover_big/xrpmydnu9rpxvxfjkiu7.jpeg",
             genres = listOf<Genre>(Genre("Indie"), Genre("Farming"))
         )
-        LargeGamePreview(game = g, description = "")
+        LargeGamePreview(game = g)
     }
 
 

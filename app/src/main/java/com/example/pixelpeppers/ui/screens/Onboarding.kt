@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.pixelpeppers.Route
+import com.example.pixelpeppers.models.Game
+import com.example.pixelpeppers.models.Genre
 import com.example.pixelpeppers.ui.components.GameCarousell
 import com.example.pixelpeppers.ui.components.GenreTag
 import com.example.pixelpeppers.ui.components.PageIndicator
@@ -34,8 +36,14 @@ var OnboardingTagValues = listOf<String>(
     "Action", "Adventure", "Indie", "Rouge Like", "Shooter", "RPG", "Strategy", "Sports", "Puzzle",
     "MMO", "Rhythm", "Card", "Horror", "Gacha", "Sandbox"
 )
-var gameCoversTop = listOf<String>("co79vq", "xrpmydnu9rpxvxfjkiu7", "co2l7z")
-var gameCoversBottom = listOf<String>("co1nh1", "co39vc", "co4b39")
+var g = Game(
+    id = 17000,
+    name = "Stardew Valley",
+    posterURL = "https://images.igdb.com/igdb/image/upload/t_cover_big/xrpmydnu9rpxvxfjkiu7.jpeg",
+    genres = listOf<Genre>(Genre("Indie"), Genre("Farming"))
+)
+//var gameCoversTop = listOf<String>("co79vq", "xrpmydnu9rpxvxfjkiu7", "co2l7z")
+//var gameCoversBottom = listOf<String>("co1nh1", "co39vc", "co4b39")
 
 @Composable
 fun Onboarding(
@@ -156,11 +164,11 @@ fun OnboardingIntro(
                 .offset(y = 150.dp)
         ) {
             GameCarousell(
-                artworkIDs = gameCoversTop,
+                games = listOf<Game>(g, g, g),
                 static = true,
             )
             GameCarousell(
-                artworkIDs = gameCoversBottom,
+                games = listOf<Game>(g, g, g),
                 static = true,
                 modifier = Modifier
                     .offset(x = (-15).dp, y = (-20).dp)

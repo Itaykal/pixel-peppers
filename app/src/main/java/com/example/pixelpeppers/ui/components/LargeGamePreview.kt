@@ -30,7 +30,6 @@ import com.example.pixelpeppers.models.Game
 @Composable
 fun LargeGamePreview(
     game: Game,
-    description: String,
     modifier: Modifier = Modifier,
     imageHeight: Dp = 250.dp,
     onClick: () -> Unit = {},
@@ -48,8 +47,7 @@ fun LargeGamePreview(
         Box (
         ) {
             GamePreview(
-                igdbArtworkId = "xrpmydnu9rpxvxfjkiu7",
-                description = "",
+                game = game,
                 contentScale = ContentScale.Crop,
                 alignment = Alignment.TopCenter,
                 modifier = modifier

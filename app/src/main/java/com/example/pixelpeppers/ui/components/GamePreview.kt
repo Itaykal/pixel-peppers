@@ -24,6 +24,7 @@ import com.bumptech.glide.integration.compose.placeholder
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.pixelpeppers.R
+import com.example.pixelpeppers.models.Game
 
 const val igdbImagePrefix = "https://images.igdb.com/igdb/image/upload/t_cover_big/"
 const val igdbImageSuffix = ".jpeg"
@@ -31,8 +32,7 @@ const val igdbImageSuffix = ".jpeg"
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun GamePreview(
-    igdbArtworkId: String,
-    description: String,
+    game: Game,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Fit,
     alignment: Alignment = Alignment.Center,
@@ -47,8 +47,8 @@ fun GamePreview(
             .clip(shape= MaterialTheme.shapes.extraLarge)
     ) {
         GlideImage(
-            model = igdbImagePrefix + igdbArtworkId + igdbImageSuffix,
-            contentDescription = description,
+            model = game.posterURL,
+            contentDescription = game.name,
             loading = placeholder(R.drawable.avd_anim_placeholder),
             transition = CrossFade,
             alignment = alignment,
