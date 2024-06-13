@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.pixelpeppers.ui.screens.MainMenu
 import com.example.pixelpeppers.ui.screens.Onboarding
+import com.example.pixelpeppers.ui.screens.Search
 import com.example.pixelpeppers.ui.screens.TempPage
 
 @Composable
@@ -34,6 +35,11 @@ fun NavGraph(
             route = Route.Login.route
         ) {
             TempPage()
+        }
+        composable(
+            route = Route.Search.route
+        ) {
+            Search()
         }
     }
 }

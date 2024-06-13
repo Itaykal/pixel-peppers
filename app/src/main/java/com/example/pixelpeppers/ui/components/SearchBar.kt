@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SearchBar(
+fun PixelPeppersSearchBar(
     modifier: Modifier = Modifier,
     placeholder: String = "Search Games",
     containerColor: Color = MaterialTheme.colorScheme.onTertiary,
@@ -29,8 +29,8 @@ fun SearchBar(
 ) {
     val searchQuery = remember { mutableStateOf("") }
     TextField(
-    singleLine = true,
-    value = searchQuery.value,
+        singleLine = true,
+        value = searchQuery.value,
         onValueChange = {
             searchQuery.value = it
             onSearch(it)
