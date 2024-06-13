@@ -28,7 +28,7 @@ fun NavGraph(
         composable(
             route = Route.Menu.route
         ) {
-            MainMenu()
+            MainMenu(navController = navController)
         }
         composable(
             route = Route.Login.route

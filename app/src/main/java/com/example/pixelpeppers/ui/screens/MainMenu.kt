@@ -23,7 +23,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.pixelpeppers.R
+import com.example.pixelpeppers.Route
 import com.example.pixelpeppers.models.Game
 import com.example.pixelpeppers.repositories.GamesRepository
 import com.example.pixelpeppers.ui.components.CircleIconButton
@@ -32,6 +34,7 @@ import com.example.pixelpeppers.ui.components.LargeGamePreview
 
 @Composable
 fun MainMenu(
+    navController: NavController,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -83,12 +86,14 @@ fun MainMenu(
                     )
                     Spacer(Modifier.weight(1f))
                     CircleIconButton(
-                        icon = painterResource(id = R.drawable.pixelpeppers),
-                        description = ""
+                        icon = painterResource(id = R.drawable.icons8_search),
+                        description = "Search",
+                        onClick = { navController.navigate(Route.Search.route) }
                     )
                     CircleIconButton(
-                        icon = painterResource(id = R.drawable.pixelpeppers),
-                        description = ""
+                        icon = painterResource(id = R.drawable.user),
+                        description = "Account",
+                        onClick = { navController.navigate(Route.Account.route) }
                     )
                 }
                 // highlighted game
