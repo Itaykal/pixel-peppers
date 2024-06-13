@@ -13,10 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.pixelpeppers.models.Game
+import com.example.pixelpeppers.models.ImageSize
 
 @Composable
 fun GameCarousell(
-    artworkIDs: List<String>,
+    games: List<Game>,
     modifier: Modifier = Modifier,
     static: Boolean = false,
 ) {
@@ -35,11 +37,11 @@ fun GameCarousell(
             modifier = modifier
                 .height(230.dp)
         ) {
-            itemsIndexed(artworkIDs) {_, artwork ->
+            itemsIndexed(games) {_, game ->
                 GamePreview(
-                    igdbArtworkId = artwork,
-                    description = "",
+                    game = game,
                     titleOn = !static,
+                    imageSize = ImageSize.COVER_BIG,
                 )
             }
         }
