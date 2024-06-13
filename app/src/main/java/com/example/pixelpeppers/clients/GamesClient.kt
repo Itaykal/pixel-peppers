@@ -24,7 +24,7 @@ private object RequestInterceptor : Interceptor {
         println("Outgoing request to ${request.url}")
         val newRequest = request.newBuilder().addHeader("accept", "application/json")
             .addHeader(CLIENT_ID, "gvp0touvixyjwkce1yi3z37d1w8203")
-            .addHeader(AUTHORIZATION_HEADER, "Bearer lmdqk6v6e5arxfqsbd9z5rh4xv40jz").build()
+            .addHeader(AUTHORIZATION_HEADER, "Bearer yis25y4dji506hc23xtcms1jgwfe4o").build()
         return chain.proceed(newRequest)
     }
 }

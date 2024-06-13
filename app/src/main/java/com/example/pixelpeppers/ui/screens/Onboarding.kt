@@ -38,20 +38,12 @@ import com.example.pixelpeppers.ui.components.GenreTag
 import com.example.pixelpeppers.ui.components.PageIndicator
 import com.example.pixelpeppers.ui.components.PixelPeppersButton
 
-
-var OnboardingTagValues = listOf<String>(
-    "Action", "Adventure", "Indie", "Rouge Like", "Shooter", "RPG", "Strategy", "Sports", "Puzzle",
-    "MMO", "Rhythm", "Card", "Horror", "Gacha", "Sandbox"
-)
 var g = Game(
     id = 17000,
     name = "Stardew Valley",
     cover = Cover("//images.igdb.com/igdb/image/upload/t_cover_big/xrpmydnu9rpxvxfjkiu7.jpeg"),
     genres = listOf<Genre>(Genre("Indie"), Genre("Farming"))
 )
-//var gameCoversTop = listOf<String>("co79vq", "xrpmydnu9rpxvxfjkiu7", "co2l7z")
-//var gameCoversBottom = listOf<String>("co1nh1", "co39vc", "co4b39")
-
 
 @Composable
 fun Onboarding(
@@ -75,7 +67,7 @@ fun Onboarding(
                 if (page == 0) {
                     navController.navigate(route = Route.OnboardingTags.route)
                 } else {
-                    navController.navigate(route = Route.Login.route)
+                    navController.navigate(route = Route.Menu.route)
                 }
             })
             if (page == 0) {

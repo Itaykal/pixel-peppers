@@ -23,10 +23,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.example.pixelpeppers.models.Game
+import com.example.pixelpeppers.models.ImageSize
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun LargeGamePreview(
     game: Game,
@@ -41,19 +40,20 @@ fun LargeGamePreview(
                 color = Color.Transparent,
                 shape = MaterialTheme.shapes.extraLarge
             )
-            .padding(PaddingValues(20.dp))
+            .padding(PaddingValues(8.dp))
             .height(imageHeight + 50.dp)
     ) {
         Box (
         ) {
             GamePreview(
                 game = game,
-                contentScale = ContentScale.Crop,
-                alignment = Alignment.TopCenter,
                 modifier = modifier
                     .clickable(onClick = onClick)
                     .height(imageHeight)
-                    .fillMaxSize()
+                    .fillMaxSize(),
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.TopCenter,
+                imageSize = ImageSize.COVER_BIG
             )
 
         }
@@ -62,7 +62,7 @@ fun LargeGamePreview(
                 .clip(shape = MaterialTheme.shapes.extraLarge)
                 .background(MaterialTheme.colorScheme.onTertiary)
                 .height(100.dp)
-                .width(350.dp)
+                .width(370.dp)
                 .align(Alignment.BottomCenter)
         ) {
             Column(

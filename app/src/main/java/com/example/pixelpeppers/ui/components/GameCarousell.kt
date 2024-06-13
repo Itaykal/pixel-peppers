@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.pixelpeppers.models.Game
+import com.example.pixelpeppers.models.ImageSize
 
 @Composable
 fun GameCarousell(
@@ -40,6 +41,7 @@ fun GameCarousell(
                 GamePreview(
                     game = game,
                     titleOn = !static,
+                    imageSize = ImageSize.COVER_BIG,
                 )
             }
         }
