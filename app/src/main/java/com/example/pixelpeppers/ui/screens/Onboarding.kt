@@ -74,7 +74,7 @@ fun Onboarding(
                 val genres = remember { mutableStateListOf<Genre>() }
                 val loading = remember { mutableStateOf(true) }
                 LaunchedEffect(Unit) {
-                    GamesRepository.getGenres {
+                    GamesRepository.instance.getGenres {
                         genres.addAll(it)
                         loading.value = false
                     }

@@ -10,7 +10,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-object GamesRepository {
+class GamesRepository private constructor() {
+    companion object {
+        val instance: GamesRepository by lazy(LazyThreadSafetyMode.SYNCHRONIZED) { GamesRepository() }
+    }
 
     fun getGenres(limit: Int = 18, callback: (genres: List<Genre>) -> Unit) {
         CoroutineScope(Dispatchers.Main).launch {

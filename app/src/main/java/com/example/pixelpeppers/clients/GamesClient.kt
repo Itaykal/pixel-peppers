@@ -1,6 +1,10 @@
 package com.example.pixelpeppers.clients
 
+import com.example.pixelpeppers.coordinators.dataCoordinator.DataCoordinator
+import com.example.pixelpeppers.extensions.await
+import com.example.pixelpeppers.repositories.UserRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import okhttp3.Call
 import okhttp3.Callback
@@ -17,14 +21,37 @@ import kotlin.coroutines.suspendCoroutine
 
 private object RequestInterceptor : Interceptor {
     private const val AUTHORIZATION_HEADER = "Authorization"
-    private const val CLIENT_ID = "Client-ID"
+    private const val CLIENT_ID_HEADER = "Client-ID"
+    private const val CLIENT_ID = "zpjv3uncv947n79ev1dvrq2vf8qkoo"
+
+    private fun isAccessTokenExpired(): Boolean {
+        val currentTime = System.currentTimeMillis()
+        val expirationTime = DataCoordinator.instance.accessTokenExpirationTime
+        return currentTime >= expirationTime!!
+    }
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request()
-        println("Outgoing request to ${request.url}")
-        val newRequest = request.newBuilder().addHeader("accept", "application/json")
-            .addHeader(CLIENT_ID, "gvp0touvixyjwkce1yi3z37d1w8203")
-            .addHeader(AUTHORIZATION_HEADER, "Bearer lmdqk6v6e5arxfqsbd9z5rh4xv40jz").build()
+        val originalRequest = chain.request()
+        var accessToken = DataCoordinator.instance.accessToken
+
+        if (accessToken != null && isAccessTokenExpired()) {
+            // Make the token refresh request
+            val refreshedToken = runBlocking {
+                val response = UserRepository.instance.refreshTwitchAccessToken()
+                // Update the refreshed access token and its expiration time in the session
+                response
+            }
+
+            if (refreshedToken != null) {
+                // Create a new request with the refreshed access token
+                accessToken = refreshedToken.accessToken
+            }
+        }
+
+        val newRequest = originalRequest.newBuilder().addHeader("accept", "application/json")
+            .addHeader(CLIENT_ID_HEADER, CLIENT_ID)
+            .addHeader(AUTHORIZATION_HEADER, "Bearer ${accessToken}").build()
+
         return chain.proceed(newRequest)
     }
 }
@@ -34,25 +61,6 @@ object GamesClient {
     private const val BASE_URL = "https://api.igdb.com/v4"
     private val PLAIN = "text/plain".toMediaType()
     private val client = OkHttpClient().newBuilder().addInterceptor(RequestInterceptor).build()
-
-    private suspend fun Call.await(): Response {
-        return suspendCoroutine { continuation ->
-            enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    continuation.resumeWithException(e)
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    if (response.isSuccessful) {
-                        continuation.resume(response)
-                    } else {
-                        continuation.resumeWithException(IOException("HTTP error code: ${response.code}"))
-                    }
-                }
-            })
-        }
-    }
-
     suspend fun getGenres(limit: Int = 18): Response = withContext(Dispatchers.IO) {
         val body = "limit $limit; fields name;".toRequestBody(PLAIN)
         val request = Request.Builder().url("$BASE_URL/genres").post(body).build()

@@ -13,11 +13,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
+import com.example.pixelpeppers.Route
+import com.example.pixelpeppers.coordinators.dataCoordinator.DataCoordinator
 import com.example.pixelpeppers.models.Genre
 import com.example.pixelpeppers.ui.components.GameCarousell
 import com.example.pixelpeppers.repositories.GamesRepository
-//import com.example.pixelpeppers.repositories.UserRepository
+import com.example.pixelpeppers.repositories.UserRepository
 import com.example.pixelpeppers.ui.components.PixelPeppersButton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class GenresViewModel
 
@@ -26,6 +31,9 @@ fun TempPage(
     modifier: Modifier = Modifier,
     navController: NavController,
     ) {
+    if (DataCoordinator.instance.accessToken != null) {
+        navController.navigate(Route.OnboardingIntro.route)
+    }
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -37,9 +45,12 @@ fun TempPage(
             "co670h", "co4jni", "co4a7a", "co1n1x",
             "co1sfj", "co5vmg", "co5xex"
         )
-//        PixelPeppersButton(text = "Login with twitch", onClick = {
-//            UserRepository.authenticateWithTwitch(context)
-//        })
+        PixelPeppersButton(text = "Login with twitch", onClick = {
+            // run async call to authenticate with twitch on background thread
+            CoroutineScope(Dispatchers.Main).launch {
+                UserRepository.instance.authenticateWithTwitch(context)
+            }
+        })
     }
 
 //    GameCarousell(artworkIDs = artworks, modifier = modifier)
