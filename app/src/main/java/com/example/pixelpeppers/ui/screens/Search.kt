@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun Search(
+    onGameClick: (Game) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val games = remember { mutableStateListOf<Game?>(null) }
@@ -68,7 +69,8 @@ fun Search(
                     if (it != null) {
                         GamePreview(
                             game = it,
-                            modifier = modifier
+                            modifier = modifier,
+                            onClick = { onGameClick(it) }
                         )
                     }
                 }

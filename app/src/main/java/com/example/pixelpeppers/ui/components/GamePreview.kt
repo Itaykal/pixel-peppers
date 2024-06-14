@@ -35,6 +35,7 @@ fun GamePreview(
     contentScale: ContentScale = ContentScale.Fit,
     alignment: Alignment = Alignment.Center,
     titleOn: Boolean = true,
+    clipping: Boolean = true,
     imageSize: ImageSize = ImageSize.DEFAULT,
     onClick: () -> Unit = {},
 ) {
@@ -44,9 +45,10 @@ fun GamePreview(
     ) {
         var imageURL = game.cover?.url ?: defaultImageURL
         imageURL = imageURL.replace(ImageSize.THUMB.size, imageSize.size)
+
+        var boxClippingMod = if (clipping) Modifier.clip(shape= MaterialTheme.shapes.extraLarge) else Modifier
         Box(
-            modifier = Modifier
-                .clip(shape= MaterialTheme.shapes.extraLarge)
+            modifier = boxClippingMod
         )
         {
             GlideImage(
@@ -57,9 +59,9 @@ fun GamePreview(
                 alignment = alignment,
                 contentScale = contentScale,
                 modifier = modifier
-                    .clickable(onClick = onClick)
+                    .clickable(onClick = onClick )
                     .height(196.dp)
-                    .width(150.dp),
+                    .width(150.dp)
             ) {
                 it
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -78,6 +80,7 @@ fun GamePreview(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .offset(x = 0.dp, y = 25.dp)
+
             )
         }
     }

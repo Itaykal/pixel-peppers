@@ -7,4 +7,5 @@ sealed class Route(val route: String) {
     object Menu: Route(route = "menu")
     object Search: Route(route = "search")
     object Account: Route(route = "account")
+    object Game: Route(route = "game")
 }

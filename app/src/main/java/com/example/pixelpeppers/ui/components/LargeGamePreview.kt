@@ -2,7 +2,6 @@ package com.example.pixelpeppers.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,12 +47,12 @@ fun LargeGamePreview(
             GamePreview(
                 game = game,
                 modifier = modifier
-                    .clickable(onClick = onClick)
                     .height(imageHeight)
                     .fillMaxSize(),
                 contentScale = ContentScale.Crop,
                 alignment = Alignment.TopCenter,
-                imageSize = ImageSize.COVER_BIG
+                imageSize = ImageSize.COVER_BIG,
+                onClick = onClick,
             )
 
         }

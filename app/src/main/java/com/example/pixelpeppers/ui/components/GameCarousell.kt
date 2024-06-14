@@ -20,6 +20,7 @@ import com.example.pixelpeppers.models.ImageSize
 fun GameCarousell(
     games: List<Game>,
     modifier: Modifier = Modifier,
+    onGameClick: (Game) -> Unit = {},
     static: Boolean = false,
 ) {
     val state = rememberLazyListState()
@@ -42,6 +43,7 @@ fun GameCarousell(
                     game = game,
                     titleOn = !static,
                     imageSize = ImageSize.COVER_BIG,
+                    onClick = { onGameClick(game) }
                 )
             }
         }
