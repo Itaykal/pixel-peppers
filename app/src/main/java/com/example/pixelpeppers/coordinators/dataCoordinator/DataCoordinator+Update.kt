@@ -5,14 +5,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 @OptIn(DelicateCoroutinesApi::class)
-fun DataCoordinator.updateUsername(username: String) {
-    this.username = username
-    GlobalScope.launch(Dispatchers.Default) {
-        setUsername(username)
-    }
-}
-
-@OptIn(DelicateCoroutinesApi::class)
 fun DataCoordinator.updateAccessToken(accessToken: String) {
     this.accessToken = accessToken
     GlobalScope.launch(Dispatchers.Default) {

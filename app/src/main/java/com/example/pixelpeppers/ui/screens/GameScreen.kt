@@ -26,7 +26,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.example.pixelpeppers.models.Game
 import com.example.pixelpeppers.models.ImageSize
-import com.example.pixelpeppers.repositories.GamesRepository
+import com.example.pixelpeppers.repositories.GameRepository
 import com.example.pixelpeppers.ui.components.GamePreview
 
 @Composable
@@ -67,7 +67,7 @@ fun GamePage(
     ) {
         val game = remember { mutableStateOf<Game?>(null) }
         LaunchedEffect(Unit) {
-            GamesRepository.instance.getGame(gameID) {
+            GameRepository.instance.getGame(gameID).let {
                 game.value = it
             }
         }

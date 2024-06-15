@@ -19,7 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.pixelpeppers.models.Game
-import com.example.pixelpeppers.repositories.GamesRepository
+import com.example.pixelpeppers.repositories.GameRepository
 import com.example.pixelpeppers.ui.components.GamePreview
 import com.example.pixelpeppers.ui.components.PixelPeppersSearchBar
 import kotlinx.coroutines.launch
@@ -51,11 +51,11 @@ fun Search(
         ) {
             PixelPeppersSearchBar(
                 onSearch = {searchQuery ->
-                    GamesRepository.instance.searchGames(searchQuery, limit = 30) {
-                        games.clear()
-                        games.addAll(it)
-                        resetLazyGrid()
-                    }
+//                    GameRepository.instance.searchGames(searchQuery, limit = 30) {
+//                        games.clear()
+//                        games.addAll(it)
+//                        resetLazyGrid()
+//                    }
                 }
             )
 

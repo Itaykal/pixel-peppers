@@ -10,7 +10,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.example.pixelpeppers.Route
 import com.example.pixelpeppers.coordinators.dataCoordinator.DataCoordinator
-import com.example.pixelpeppers.repositories.TwitchAuthRepository
+import com.example.pixelpeppers.services.UserService
 import com.example.pixelpeppers.ui.components.PixelPeppersButton
 
 
@@ -34,7 +34,7 @@ fun TempPage(
             "co1sfj", "co5vmg", "co5xex"
         )
         PixelPeppersButton(text = "Login with twitch", onClick = {
-            TwitchAuthRepository.instance.startTwitchAuthActivity(context)
+            UserService.instance.startTwitchAuthActivity(context)
         })
     }
 
