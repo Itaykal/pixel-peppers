@@ -64,12 +64,12 @@ fun Onboarding(
             PixelPeppersButton(
                 text = "Next",
                 onClick = {
-                if (page == 0) {
-                    navController.navigate(route = Route.OnboardingTags.route)
-                } else {
-                    navController.navigate(route = Route.Menu.route)
-                }
-            })
+                    if (page == 0) {
+                        navController.navigate(route = Route.OnboardingTags.route)
+                    } else {
+                        navController.navigate(route = Route.Menu.route)
+                    }
+                })
             if (page == 0) {
                 OnboardingIntro(
                     modifier = modifier
@@ -77,30 +77,15 @@ fun Onboarding(
                         .fillMaxSize(),
                 )
             } else if (page == 1) {
-                val genres = remember { mutableStateListOf<Genre>() }
-                val loading = remember { mutableStateOf(true) }
-                LaunchedEffect(Unit) {
-                    GamesRepository.instance.getGenres {
-                        genres.addAll(it)
-                        loading.value = false
-                    }
-                }
-                if (loading.value) {
-                    // TODO: Add loader here
-                    Text(text = "Loading...")
-                } else {
-                    OnboardingTags(
-                        modifier = modifier
-                            .padding(paddingValues)
-                            .fillMaxSize(),
-                        onboardingTagValues = genres,
-                    )
-                }
+                OnboardingTags(
+                    modifier = modifier
+                        .padding(paddingValues)
+                        .fillMaxSize(),
+                )
             }
         }
     }
 }
-
 
 
 @Composable
@@ -114,7 +99,7 @@ fun OnboardingTags(
     val loading = remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        GamesRepository.getGenres (limit = rows * columns) {
+        GamesRepository.instance.getGenres(limit = rows * columns) {
             genres.addAll(it)
             loading.value = false
         }
@@ -122,7 +107,7 @@ fun OnboardingTags(
 
 
     if (loading.value) {
-        Box (
+        Box(
             contentAlignment = Alignment.Center,
             modifier = modifier
         ) {

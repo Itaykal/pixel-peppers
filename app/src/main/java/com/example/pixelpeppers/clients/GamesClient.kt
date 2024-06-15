@@ -42,10 +42,7 @@ private object RequestInterceptor : Interceptor {
                 response
             }
 
-            if (refreshedToken != null) {
-                // Create a new request with the refreshed access token
-                accessToken = refreshedToken.accessToken
-            }
+            accessToken = refreshedToken.accessToken
         }
 
         val newRequest = originalRequest.newBuilder().addHeader("accept", "application/json")
