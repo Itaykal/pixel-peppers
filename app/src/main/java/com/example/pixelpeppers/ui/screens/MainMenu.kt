@@ -10,8 +10,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,9 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.example.pixelpeppers.R
-import com.example.pixelpeppers.Route
 import com.example.pixelpeppers.models.Game
 import com.example.pixelpeppers.repositories.GamesRepository
 import com.example.pixelpeppers.ui.components.CircleIconButton
@@ -34,10 +33,12 @@ import com.example.pixelpeppers.ui.components.LargeGamePreview
 
 @Composable
 fun MainMenu(
-    navController: NavController,
+    onGameClick: (Game) -> Unit,
+    onAccountClick: () -> Unit,
+    onSearchClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val scrollState = rememberScrollState()
+    val state = rememberLazyListState()
     val trendingGame = remember { mutableStateOf<Game?>(null) }
     val gamesMap = remember { mutableStateMapOf<String, List<Game>>() }
     val topics = listOf<String>("tmp", "tmp2", "tmp3")
@@ -61,56 +62,61 @@ fun MainMenu(
         if (trendingGame.value == null || gamesMap.size != topics.size) {
             LoadingAnimation()
         } else {
-            Column (
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+            LazyColumn (
+                state = state,
+                verticalArrangement = Arrangement.spacedBy(30.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = modifier
-                    .verticalScroll(scrollState)
                     .padding(top = 35.dp, bottom = 35.dp)
 
             ) {
-                Row(
-                    verticalAlignment = Alignment.Top,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),//, Alignment.End),
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .padding(start = 8.dp, end = 8.dp)
-                ) {
-                    Text(
-                        text = "Hey, User",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        maxLines = 1,
-                        modifier = Modifier
-                            .align(Alignment.CenterVertically)
-                    )
-                    Spacer(Modifier.weight(1f))
-                    CircleIconButton(
-                        icon = painterResource(id = R.drawable.icons8_search),
-                        description = "Search",
-                        onClick = { navController.navigate(Route.Search.route) }
-                    )
-                    CircleIconButton(
-                        icon = painterResource(id = R.drawable.user),
-                        description = "Account",
-                        onClick = { navController.navigate(Route.Account.route) }
-                    )
+                item {
+                    Row(
+                        verticalAlignment = Alignment.Top,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),//, Alignment.End),
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .padding(start = 8.dp, end = 8.dp)
+                    ) {
+                        Text(
+                            text = "Hey, User",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            maxLines = 1,
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                        )
+                        Spacer(Modifier.weight(1f))
+                        CircleIconButton(
+                            icon = painterResource(id = R.drawable.icons8_search),
+                            description = "Search",
+                            onClick = onSearchClick
+                        )
+                        CircleIconButton(
+                            icon = painterResource(id = R.drawable.user),
+                            description = "Account",
+                            onClick = onAccountClick
+                        )
+                    }
+                    // highlighted game
+                    Row (
+                        verticalAlignment = Alignment.Top,
+                    ) {
+                        LargeGamePreview(
+                            game = trendingGame.value!!,
+                            onClick = { onGameClick(trendingGame.value!!) },
+                        )
+                    }
                 }
-                // highlighted game
-                Row (
-                    verticalAlignment = Alignment.Top,
-                ) {
-                    LargeGamePreview(game = trendingGame.value!!)
-                }
-                // Autogenerated X game lists
-                for (entry in gamesMap.entries.iterator()) {
+
+                items(gamesMap.keys.toList()) { key ->
                     Row (
                         modifier = Modifier
                             .fillMaxWidth()
                     ) {
                         Column {
                             Text(
-                                text = entry.key,
+                                text = key,
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onBackground,
                                 maxLines = 1,
@@ -119,7 +125,8 @@ fun MainMenu(
                             )
 
                             GameCarousell(
-                                games = entry.value,
+                                games = gamesMap[key]!!,
+                                onGameClick = onGameClick,
                                 modifier = Modifier
                                     .fillMaxWidth()
                             )

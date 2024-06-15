@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.pixelpeppers.models.Game
+import com.example.pixelpeppers.ui.screens.GamePage
 import com.example.pixelpeppers.ui.screens.MainMenu
 import com.example.pixelpeppers.ui.screens.Onboarding
 import com.example.pixelpeppers.ui.screens.Search
@@ -14,6 +16,7 @@ fun NavGraph(
     startDestination: String
 ) {
     val navController = rememberNavController()
+    val navigateGame: (Game) -> Unit = { game: Game -> navController.navigate(route = "${Route.Game.route}/${game.id}") }
 
     NavHost(navController = navController, startDestination = startDestination) {
         composable(
@@ -29,7 +32,11 @@ fun NavGraph(
         composable(
             route = Route.Menu.route
         ) {
-            MainMenu(navController = navController)
+            MainMenu(
+                onGameClick = navigateGame,
+                onSearchClick = { navController.navigate(route = Route.Search.route) },
+                onAccountClick = { navController.navigate(route = Route.Login.route) },
+            )
         }
         composable(
             route = Route.Login.route
@@ -39,7 +46,14 @@ fun NavGraph(
         composable(
             route = Route.Search.route
         ) {
-            Search()
+            Search(onGameClick = navigateGame)
+        }
+        composable(
+            route = "${Route.Game.route}/{gameID}"
+        ) {
+            GamePage(
+                gameID = it.arguments?.getString("gameID")?.toInt() ?: 17000,
+            )
         }
     }
 }
