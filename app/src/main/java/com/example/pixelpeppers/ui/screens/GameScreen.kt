@@ -67,7 +67,7 @@ fun GamePage(
     ) {
         val game = remember { mutableStateOf<Game?>(null) }
         LaunchedEffect(Unit) {
-            GamesRepository.getGame(gameID) {
+            GamesRepository.instance.getGame(gameID) {
                 game.value = it
             }
         }
