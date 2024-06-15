@@ -2,10 +2,8 @@ package com.example.pixelpeppers.ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -39,10 +37,7 @@ fun GamePreview(
     imageSize: ImageSize = ImageSize.DEFAULT,
     onClick: () -> Unit = {},
 ) {
-    Box(
-        modifier = Modifier
-            .padding(PaddingValues(bottom = 25.dp))
-    ) {
+    Box() {
         var imageURL = game.cover?.url ?: defaultImageURL
         imageURL = imageURL.replace(ImageSize.THUMB.size, imageSize.size)
 

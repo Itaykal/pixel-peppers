@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
@@ -23,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import com.example.pixelpeppers.models.Game
 import com.example.pixelpeppers.models.ImageSize
 import com.example.pixelpeppers.repositories.GamesRepository
@@ -39,7 +39,7 @@ fun GamePage(
         derivedStateOf {
             when {
                 lazyListState.layoutInfo.visibleItemsInfo.isNotEmpty()
-                        && lazyListState.firstVisibleItemIndex == 0 -> lazyListState.firstVisibleItemScrollOffset * 0.3f
+                        && lazyListState.firstVisibleItemIndex == 0 -> lazyListState.firstVisibleItemScrollOffset * 0.9f
                 else -> 0f
             }
         }
@@ -86,6 +86,7 @@ fun GamePage(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(bottom = 30.dp)
                 ) {
                     item {
                         GamePreview(
@@ -111,13 +112,11 @@ fun GamePage(
                             text = index.toString(),
                             color = MaterialTheme.colorScheme.onBackground,
                             modifier = modifier
-                                .zIndex(10f)
                                 .fillMaxWidth()
                                 .background(MaterialTheme.colorScheme.background)
                         )
                         Spacer(
                             modifier = Modifier.height(10.dp)
-                                .zIndex(10f)
                                 .fillMaxWidth()
                                 .background(MaterialTheme.colorScheme.background)
                         )

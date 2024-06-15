@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,7 +38,6 @@ fun MainMenu(
     onSearchClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val scrollState = rememberScrollState()
     val state = rememberLazyListState()
     val trendingGame = remember { mutableStateOf<Game?>(null) }
     val gamesMap = remember { mutableStateMapOf<String, List<Game>>() }
@@ -66,10 +64,9 @@ fun MainMenu(
         } else {
             LazyColumn (
                 state = state,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(30.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = modifier
-//                    .verticalScroll(scrollState)
                     .padding(top = 35.dp, bottom = 35.dp)
 
             ) {
