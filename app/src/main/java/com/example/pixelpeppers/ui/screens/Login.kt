@@ -26,7 +26,7 @@ import androidx.navigation.NavController
 import com.example.pixelpeppers.R
 import com.example.pixelpeppers.Route
 import com.example.pixelpeppers.coordinators.dataCoordinator.DataCoordinator
-import com.example.pixelpeppers.repositories.TwitchAuthRepository
+import com.example.pixelpeppers.services.UserService
 
 
 @Composable
@@ -35,6 +35,7 @@ fun Login(
     navController: NavController,
 ) {
     if (DataCoordinator.instance.accessToken != null) {
+        // @@ TODO: Remove navcontroller
         navController.navigate(Route.OnboardingIntro.route)
     }
     Box(
@@ -61,7 +62,8 @@ fun Login(
                 shape = MaterialTheme.shapes.small,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF633ea6)),
                 onClick = {
-                    TwitchAuthRepository.instance.startTwitchAuthActivity(context)
+                    // @@ TODO: Use ViewModel
+                    UserService.instance.startTwitchAuthActivity(context)
                 },
             ) {
                 Icon(
