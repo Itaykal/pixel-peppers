@@ -43,11 +43,11 @@ fun MainMenu(
     val topics = listOf<String>("tmp", "tmp2", "tmp3")
 
     LaunchedEffect(Unit) {
-        GamesRepository.getGame(17000) {
+        GamesRepository.instance.getGame(17000) {
             trendingGame.value = it
         }
         for (topic in topics) {
-            GamesRepository.searchGames("stardew", limit = 20) {
+            GamesRepository.instance.searchGames("stardew", limit = 20) {
                 gamesMap[topic] = it
             }
         }
