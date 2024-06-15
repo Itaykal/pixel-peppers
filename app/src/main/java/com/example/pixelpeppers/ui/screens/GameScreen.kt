@@ -4,6 +4,8 @@ import LoadingAnimation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,11 +13,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -27,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.pixelpeppers.R
 import com.example.pixelpeppers.models.Game
@@ -34,6 +39,7 @@ import com.example.pixelpeppers.models.ImageSize
 import com.example.pixelpeppers.models.Review
 import com.example.pixelpeppers.repositories.GamesRepository
 import com.example.pixelpeppers.ui.components.GamePreview
+import com.example.pixelpeppers.ui.components.GenreTag
 import com.example.pixelpeppers.ui.components.ReviewBlock
 import com.example.pixelpeppers.ui.components.ReviewDialog
 
@@ -87,6 +93,8 @@ fun GamePage(
             .background(MaterialTheme.colorScheme.background)
     ) {
         val game = remember { mutableStateOf<Game?>(null) }
+//        val reviews = remember { mutableStateListOf<Review>() }
+
         LaunchedEffect(Unit) {
             GamesRepository.instance.getGame(gameID) {
                 game.value = it
@@ -104,7 +112,7 @@ fun GamePage(
                 LazyColumn(
                     state = lazyListState,
                     verticalArrangement = Arrangement.spacedBy(0.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                    horizontalAlignment = Alignment.Start,
                     modifier = Modifier
                         .fillMaxWidth()
                 ) {
@@ -117,7 +125,7 @@ fun GamePage(
                             contentScale = ContentScale.Crop,
                             alignment = Alignment.TopCenter,
                             modifier = modifier
-                                .height(350.dp)
+                                .height(250.dp)
                                 .fillMaxWidth()
                                 .background(MaterialTheme.colorScheme.background)
                                 .graphicsLayer {
@@ -126,7 +134,7 @@ fun GamePage(
                                 }
                         )
                     }
-                    val r = Review(
+                    val reviews = listOf<Review>(Review(
                         id = "1",
                         rating = 4,
                         title = "Review",
@@ -134,7 +142,7 @@ fun GamePage(
                         authorId = "1",
                         authorDisplayName = "torrell8",
                         gameId = 17000,
-                    )
+                    ))
 
                     item {
                         Spacer(
@@ -144,16 +152,46 @@ fun GamePage(
                                 .background(MaterialTheme.colorScheme.background)
                         )
                     }
-                    items(5) { index ->
+                    item {
+                        Column (
+                            verticalArrangement = Arrangement.spacedBy(5.dp),
+                            modifier = Modifier
+                                .padding(start = 10.dp, bottom = 10.dp)
+                        ) {
+                            Text(
+                                text = gameRes.name,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.ExtraBold,
+                                maxLines = 1,
+                            )
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                            ) {
+                                repeat(3) { index ->
+                                    if (index < game.value!!.genres.size) {
+                                        GenreTag(
+                                            text = game.value!!.genres[index].name,
+                                            clickable = false,
+                                            modifier = Modifier
+                                                .height(30.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    itemsIndexed(reviews) { index, review ->
                         // @@ TODO: Implement comment fetching
-                        ReviewBlock(review = r)
+                        ReviewBlock(review = review)
                         Spacer(
                             modifier = Modifier
                                 .height(10.dp)
                                 .fillMaxWidth()
                                 .background(MaterialTheme.colorScheme.background)
                         )
-                        if (index == 4) {
+                        if (index == reviews.size - 1) {
                             Spacer(
                                 modifier = Modifier
                                     .height(100.dp)
@@ -185,3 +223,5 @@ fun GamePage(
         }
     }
 }
+
+
