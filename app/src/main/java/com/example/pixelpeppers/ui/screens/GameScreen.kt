@@ -9,42 +9,52 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.pixelpeppers.R
 import com.example.pixelpeppers.models.Game
 import com.example.pixelpeppers.models.ImageSize
+import com.example.pixelpeppers.models.Review
 import com.example.pixelpeppers.repositories.GamesRepository
 import com.example.pixelpeppers.ui.components.GamePreview
+import com.example.pixelpeppers.ui.components.ReviewBlock
+import com.example.pixelpeppers.ui.components.ReviewDialog
 
 @Composable
 fun GamePage(
     modifier: Modifier = Modifier,
     gameID: Int = 17000,
 ) {
+    val showReviewDialog = remember { mutableStateOf(false) }
     val lazyListState = rememberLazyListState()
-    val firstItemTranslationY by remember {
+    val firstItemTranslationY = remember {
         derivedStateOf {
             when {
                 lazyListState.layoutInfo.visibleItemsInfo.isNotEmpty()
                         && lazyListState.firstVisibleItemIndex == 0 -> lazyListState.firstVisibleItemScrollOffset * 0.9f
+
                 else -> 0f
             }
         }
     }
-    val visibility by remember {
+    val visibility = remember {
         derivedStateOf {
             when {
                 lazyListState.layoutInfo.visibleItemsInfo.isNotEmpty() && lazyListState.firstVisibleItemIndex == 0 -> {
@@ -53,11 +63,23 @@ fun GamePage(
 
                     scrollOffset / imageSize.toFloat()
                 }
-                else                                                                                               -> 1f
+
+                else -> 1f
             }
         }
     }
 
+
+    if (showReviewDialog.value) {
+        ReviewDialog(
+            onSubmit = {
+                println("Submit :)")
+            },
+            onCancel = {
+                showReviewDialog.value = false
+            }
+        )
+    }
 
     Box(
         contentAlignment = Alignment.Center,
@@ -75,18 +97,17 @@ fun GamePage(
             LoadingAnimation()
         } else {
             val gameRes = game.value!!
-            Box (
+            Box(
                 modifier = modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
             ) {
-                LazyColumn (
+                LazyColumn(
                     state = lazyListState,
                     verticalArrangement = Arrangement.spacedBy(0.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 30.dp)
                 ) {
                     item {
                         GamePreview(
@@ -101,26 +122,65 @@ fun GamePage(
                                 .fillMaxWidth()
                                 .background(MaterialTheme.colorScheme.background)
                                 .graphicsLayer {
-                                    translationY = firstItemTranslationY
-                                    alpha = 1f - visibility
+                                    translationY = firstItemTranslationY.value
+                                    alpha = 1f - visibility.value
                                 }
                         )
                     }
-                    items(66) {index ->
-                        // @@ TODO: Implement comment fetching and component.
-                        Text(
-                            text = index.toString(),
-                            color = MaterialTheme.colorScheme.onBackground,
-                            modifier = modifier
-                                .fillMaxWidth()
-                                .background(MaterialTheme.colorScheme.background)
-                        )
+                    val r = Review(
+                        id = "1",
+                        rating = 4,
+                        title = "Review",
+                        description = "Bacon ipsum dolor amet burgdoggen spare ribs landjaeger, rump ham shank prosciutto hamburger chuck sirloin pork belly. Jowl capicola biltong jerky sausage burgdoggen cupim drumstick swine leberkas tri-tip bacon. Biltong beef meatloaf burgdoggen hamburger turducken venison pork loin spare ribs beef ribs bresaola short ribs leberkas chuck pork. Turkey kielbasa tenderloin pastrami drumstick frankfurter salami. Pork chop pastrami jerky chislic cow, shoulder sausage chuck swine pork loin kevin doner boudin fatback landjaeger.",
+                        authorId = "1",
+                        authorDisplayName = "torrell8",
+                        gameId = 17000,
+                    )
+
+                    item {
                         Spacer(
-                            modifier = Modifier.height(10.dp)
+                            modifier = Modifier
+                                .height(10.dp)
                                 .fillMaxWidth()
                                 .background(MaterialTheme.colorScheme.background)
                         )
                     }
+                    items(5) { index ->
+                        // @@ TODO: Implement comment fetching
+                        ReviewBlock(review = r)
+                        Spacer(
+                            modifier = Modifier
+                                .height(10.dp)
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.background)
+                        )
+                        if (index == 4) {
+                            Spacer(
+                                modifier = Modifier
+                                    .height(100.dp)
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colorScheme.background)
+                            )
+                        }
+                    }
+                }
+                FloatingActionButton(
+                    onClick = {
+                        showReviewDialog.value = true
+                    },
+                    shape = CircleShape,
+                    modifier = Modifier
+                        .padding(bottom = 40.dp, end = 10.dp)
+                        .align(Alignment.BottomEnd)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.plus),
+                        contentDescription = "Add Comment",
+                        tint = Color.White,
+                        modifier = Modifier
+                            .size(60.dp)
+                            .padding(10.dp)
+                    )
                 }
             }
         }
