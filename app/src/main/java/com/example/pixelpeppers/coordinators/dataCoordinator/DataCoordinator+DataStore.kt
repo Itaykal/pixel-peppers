@@ -25,7 +25,7 @@ suspend fun DataCoordinator.setAccessTokenExpirationTime(time: Long) {
     }
 }
 
-suspend fun DataCoordinator.getAccessTokenExpirationTime(): Long? {
+suspend fun DataCoordinator.getAccessTokenExpirationTime(): Long {
     val context = this.context ?: return defaultAccessTokenExpirationTimeValue
     return context.dataStore.data.firstOrNull()?.get(PreferencesKeys.accessTokenExpirationTime)
         ?: defaultAccessTokenExpirationTimeValue

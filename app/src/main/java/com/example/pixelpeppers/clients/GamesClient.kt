@@ -2,22 +2,16 @@ package com.example.pixelpeppers.clients
 
 import com.example.pixelpeppers.coordinators.dataCoordinator.DataCoordinator
 import com.example.pixelpeppers.extensions.await
-import com.example.pixelpeppers.repositories.UserRepository
+import com.example.pixelpeppers.repositories.TwitchAuthRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import okhttp3.Call
-import okhttp3.Callback
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
-import java.io.IOException
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 private object RequestInterceptor : Interceptor {
     private const val AUTHORIZATION_HEADER = "Authorization"
@@ -27,19 +21,17 @@ private object RequestInterceptor : Interceptor {
     private fun isAccessTokenExpired(): Boolean {
         val currentTime = System.currentTimeMillis()
         val expirationTime = DataCoordinator.instance.accessTokenExpirationTime
-        return currentTime >= expirationTime!!
+        return currentTime >= expirationTime
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
         var accessToken = DataCoordinator.instance.accessToken
 
-        if (accessToken != null && isAccessTokenExpired()) {
+        if (accessToken == null || isAccessTokenExpired()) {
             // Make the token refresh request
             val refreshedToken = runBlocking {
-                val response = UserRepository.instance.refreshTwitchAccessToken()
-                // Update the refreshed access token and its expiration time in the session
-                response
+                TwitchAuthRepository.instance.refreshAccessToken()
             }
 
             accessToken = refreshedToken.accessToken

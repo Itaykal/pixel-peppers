@@ -18,8 +18,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 
 
-
-class UserRepository private constructor() {
+class TwitchAuthRepository private constructor() {
     private val client = OkHttpClient().newBuilder().build()
 
     companion object {
@@ -30,11 +29,11 @@ class UserRepository private constructor() {
         const val FUNCTIONS_URI = "https://us-central1-pixel-peppers.cloudfunctions.net/"
         const val FUNCTION_NAME = "authenticateWithTwitch"
         const val CLIENT_ID = "zpjv3uncv947n79ev1dvrq2vf8qkoo"
-        val instance: UserRepository by lazy(LazyThreadSafetyMode.SYNCHRONIZED) { UserRepository() }
+        val instance: TwitchAuthRepository by lazy(LazyThreadSafetyMode.SYNCHRONIZED) { TwitchAuthRepository() }
         val functions: FirebaseFunctions = Firebase.functions
     }
 
-    suspend fun authenticateWithTwitch(context: Context) = withContext(Dispatchers.IO) {
+    fun startTwitchAuthActivity(context: Context) {
         val uri = "$AUTHORIZE_URI?" +
                 "client_id=$CLIENT_ID&" +
                 "redirect_uri=${AUTH_REDIRECT_URI}&" +
@@ -44,19 +43,23 @@ class UserRepository private constructor() {
         context.startActivity(intent)
     }
 
-    suspend fun getCustomAuthToken(code: String): String {
+    suspend fun authenticateWithTwitch(code: String, onSuccess: (token: String) -> Unit) =
+        withContext(Dispatchers.IO) {
+            val customAuthToken = getCustomAuthToken(code)
+            onSuccess(customAuthToken)
+        }
+
+    private suspend fun getCustomAuthToken(code: String): String = withContext(Dispatchers.IO) {
         val url = "$FUNCTIONS_URI/$FUNCTION_NAME?" +
                 "code=$code"
         val request = Request.Builder()
             .url(url)
             .addHeader(ORIGIN_HEADER, PIXEL_PEPPERS)
             .build()
-        println("adding header")
-        val result = client.newCall(request).await()
-        return result.body?.string() ?: ""
+        client.newCall(request).await().body?.string() ?: ""
     }
 
-    suspend fun refreshTwitchAccessToken(): AccessTokenResponse {
+    suspend fun refreshAccessToken(): AccessTokenResponse = withContext(Dispatchers.IO) {
         val result = functions
             .getHttpsCallable("getTwitchAccessToken")
             .call()
@@ -64,6 +67,6 @@ class UserRepository private constructor() {
         val accessTokenResponse = AccessTokenResponse.fromMap(result.data as HashMap<*, *>)
         DataCoordinator.instance.updateAccessToken(accessTokenResponse.accessToken)
         DataCoordinator.instance.updateTokenExpires(accessTokenResponse.expiresIn)
-        return accessTokenResponse
+        accessTokenResponse
     }
 }

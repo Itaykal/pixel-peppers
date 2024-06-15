@@ -7,16 +7,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.pixelpeppers.coordinators.dataCoordinator.DataCoordinator
-import com.example.pixelpeppers.coordinators.dataCoordinator.updateAccessToken
-import com.example.pixelpeppers.coordinators.dataCoordinator.updateTokenExpires
-import com.example.pixelpeppers.coordinators.dataCoordinator.updateUsername
-import com.example.pixelpeppers.repositories.UserRepository
+import com.example.pixelpeppers.repositories.TwitchAuthRepository
 import com.example.pixelpeppers.ui.theme.PixelPeppersTheme
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity(
 ) {
@@ -24,27 +22,17 @@ class MainActivity : ComponentActivity(
 
     override fun onStart() {
         super.onStart()
-//        val currentUser = auth.currentUser
-        val accessToken = DataCoordinator.instance.accessToken
         val currentUser = auth.currentUser
         var route: Route = Route.Login
         if (currentUser != null) {
-            currentUser.let {
-                DataCoordinator.instance.updateUsername(currentUser.displayName!!)
-            }
-            route = Route.OnboardingIntro
+            route = Route.Menu
         } else {
             val uri: Uri? = intent.data
             if (uri != null && uri.path.equals("/auth")) {
                 val code = uri.getQueryParameter("code")
                 if (code != null) {
-                    runBlocking {
-                        val customAuthToken = UserRepository.instance.getCustomAuthToken(code)
-                        println(customAuthToken)
-                        auth.signInWithCustomToken(customAuthToken).await()
-                        UserRepository.instance.refreshTwitchAccessToken()
-                        route = Route.OnboardingIntro
-                    }
+                    authenticateWithCode(code)
+                    route = Route.OnboardingIntro
                 }
             }
         }
@@ -61,10 +49,15 @@ class MainActivity : ComponentActivity(
         enableEdgeToEdge()
         installSplashScreen()
         auth = Firebase.auth
-        runBlocking {
-            DataCoordinator.instance.initializeAsync(baseContext)
-        }
+        DataCoordinator.instance.initialize(baseContext)
     }
 
+    private fun authenticateWithCode(code: String) {
+        CoroutineScope(Dispatchers.Main).launch {
+            TwitchAuthRepository.instance.authenticateWithTwitch(code) {
+                auth.signInWithCustomToken(it)
+            }
+        }
+    }
 }
 

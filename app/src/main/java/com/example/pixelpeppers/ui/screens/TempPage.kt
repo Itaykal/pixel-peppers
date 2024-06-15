@@ -5,17 +5,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.example.pixelpeppers.Route
 import com.example.pixelpeppers.coordinators.dataCoordinator.DataCoordinator
-import com.example.pixelpeppers.repositories.UserRepository
+import com.example.pixelpeppers.repositories.TwitchAuthRepository
 import com.example.pixelpeppers.ui.components.PixelPeppersButton
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 @Composable
@@ -38,10 +34,7 @@ fun TempPage(
             "co1sfj", "co5vmg", "co5xex"
         )
         PixelPeppersButton(text = "Login with twitch", onClick = {
-            // run async call to authenticate with twitch on background thread
-            CoroutineScope(Dispatchers.Main).launch {
-                UserRepository.instance.authenticateWithTwitch(context)
-            }
+            TwitchAuthRepository.instance.startTwitchAuthActivity(context)
         })
     }
 

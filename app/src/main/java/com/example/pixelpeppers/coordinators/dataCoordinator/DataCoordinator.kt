@@ -17,8 +17,8 @@ class DataCoordinator private constructor() {
     var accessToken: String? = null
     val defaultAccessTokenValue: String? = null
 
-    var accessTokenExpirationTime: Long? = null
-    val defaultAccessTokenExpirationTimeValue: Long? = null
+    var accessTokenExpirationTime: Long = 0
+    val defaultAccessTokenExpirationTimeValue: Long = 0
 
     var username: String? = null
     val defaultUsernameValue: String? = null
@@ -29,7 +29,7 @@ class DataCoordinator private constructor() {
     )
 
     @OptIn(DelicateCoroutinesApi::class)
-    fun initialize(context: Context, onLoad: () -> Unit) {
+    fun initialize(context: Context, onLoad: () -> Unit = {}) {
         GlobalScope.launch(Dispatchers.Default) {
             initializeAsync(context)
             onLoad()
