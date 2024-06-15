@@ -1,6 +1,5 @@
 package com.example.pixelpeppers.ui.components
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,52 +12,68 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.CrossFade
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.resource.bitmap.CenterInside
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.pixelpeppers.R
+import com.example.pixelpeppers.models.Game
+import com.example.pixelpeppers.models.ImageSize
 
-const val igdbImagePrefix = "https://images.igdb.com/igdb/image/upload/t_cover_big/"
-const val igdbImageSuffix = ".jpeg"
+val defaultImageURL = "https://images.igdb.com/igdb/image/upload/${ImageSize.DEFAULT.size}/xrpmydnu9rpxvxfjkiu7.jpeg"
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun GamePreview(
-    igdbArtworkId: String,
-    description: String,
+    game: Game,
     modifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.Fit,
+    alignment: Alignment = Alignment.Center,
     titleOn: Boolean = true,
-    title: String = "Placeholder",
+    imageSize: ImageSize = ImageSize.DEFAULT,
     onClick: () -> Unit = {},
 ) {
     Box(
         modifier = Modifier
-            .border(width = 0.dp, color = Color.Transparent, shape = MaterialTheme.shapes.extraLarge)
             .padding(PaddingValues(bottom = 25.dp))
     ) {
-        GlideImage(
-            model = igdbImagePrefix + igdbArtworkId + igdbImageSuffix,
-            contentDescription = description,
-            loading = placeholder(R.drawable.avd_anim_placeholder),
-            transition = CrossFade,
-            modifier = modifier
-                .clickable(onClick = onClick)
-                .height(196.dp)
-                .width(150.dp),
-        ) {
-            it
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .transform(CenterInside(), RoundedCorners(70))
+        var imageURL = game.cover?.url ?: defaultImageURL
+        imageURL = imageURL.replace(ImageSize.THUMB.size, imageSize.size)
+        Box(
+            modifier = Modifier
+                .clip(shape= MaterialTheme.shapes.extraLarge)
+        )
+        {
+            GlideImage(
+                model = "https:${imageURL}",
+                contentDescription = game.name,
+                loading = placeholder(R.drawable.avd_anim_placeholder),
+                transition = CrossFade,
+                alignment = alignment,
+                contentScale = contentScale,
+                modifier = modifier
+                    .clickable(onClick = onClick)
+                    .height(196.dp)
+                    .width(150.dp),
+            ) {
+                it
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .transform(RoundedCorners(70))
+            }
         }
         if (titleOn) {
+            var gameTitle = game.name?: "Placeholder"
+            if (gameTitle.length > 15) {
+                gameTitle = gameTitle.substring(0, 15) + "..."
+            }
             Text(
-                text = title,
+                text = gameTitle,
+                maxLines = 1,
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)

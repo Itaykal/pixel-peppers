@@ -1,15 +1,15 @@
 package com.example.pixelpeppers.ui.screens
 
+import LoadingAnimation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
@@ -23,8 +23,9 @@ import com.example.pixelpeppers.ui.components.PixelPeppersButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
-class GenresViewModel
+import com.example.pixelpeppers.models.Game
+import com.example.pixelpeppers.repositories.GamesRepository
+import com.example.pixelpeppers.ui.components.LargeGamePreview
 
 @Composable
 fun TempPage(
@@ -33,12 +34,15 @@ fun TempPage(
     ) {
     if (DataCoordinator.instance.accessToken != null) {
         navController.navigate(Route.OnboardingIntro.route)
-    }
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-    ) {
+) {
+    val game = remember { mutableStateOf<Game?>(null) }
+    val loading = remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        GamesRepository.getGame(17000) {
+            game.value = it
+            loading.value = false
+        }
         val context = LocalContext.current
         val artworks: List<String> = listOf<String>(
             "co2k2z", "co6xe3", "co5ff7", "co1nic",
@@ -53,5 +57,4 @@ fun TempPage(
         })
     }
 
-//    GameCarousell(artworkIDs = artworks, modifier = modifier)
 }

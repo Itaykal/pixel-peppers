@@ -18,6 +18,7 @@ fun CircleIconButton(
     icon: Painter,
     description: String,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
     containerColor: Color = MaterialTheme.colorScheme.onTertiary,
 ) {
     Button(
@@ -28,7 +29,7 @@ fun CircleIconButton(
             contentColor = MaterialTheme.colorScheme.onBackground,
             containerColor = containerColor
         ),
-        onClick = { /*TODO*/ }
+        onClick = onClick
     ) {
         Icon(painter = icon, contentDescription = description)
     }

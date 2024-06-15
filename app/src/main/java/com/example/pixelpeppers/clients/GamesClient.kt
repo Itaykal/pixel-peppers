@@ -51,7 +51,6 @@ private object RequestInterceptor : Interceptor {
         val newRequest = originalRequest.newBuilder().addHeader("accept", "application/json")
             .addHeader(CLIENT_ID_HEADER, CLIENT_ID)
             .addHeader(AUTHORIZATION_HEADER, "Bearer ${accessToken}").build()
-
         return chain.proceed(newRequest)
     }
 }
