@@ -7,33 +7,35 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReviewDialog(
-    onSubmit: () -> Unit,
-    onCancel: () -> Unit,
+    onSubmit: (title: String, description: String, rating: Int) -> Unit,
     modifier: Modifier = Modifier,
+    onDismissRequest: () -> Unit = {},
 ) {
-    var ratingExpanded = remember { mutableStateOf(false) }
-    var selectedRating = remember { mutableStateOf("1") }
+    var rating = remember { mutableIntStateOf(1) } //default rating will be 1
+    var isTitleValid = remember { mutableStateOf(false) }
+    var title = remember { mutableStateOf("") }
+    var review = remember { mutableStateOf("") }
 
-
-    Dialog(onDismissRequest = {}) {
+    Dialog(onDismissRequest = onDismissRequest) {
         Box(
             modifier = modifier
                 .background(MaterialTheme.colorScheme.onTertiary)
+                .clip(shape = MaterialTheme.shapes.extraLarge)
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -42,56 +44,35 @@ fun ReviewDialog(
                     .padding(20.dp)
             ) {
                 TextField(
-                    value = "",
-                    onValueChange = {},
+                    value = title.value,
+                    onValueChange = {
+                        title.value = it
+                        isTitleValid.value = it.isNotEmpty()
+                    },
+                    isError = isTitleValid.value.not(),
                     maxLines = 1,
                     placeholder = { Text("Title", color = MaterialTheme.colorScheme.onSurface) }
                 )
                 TextField(
-                    value = "",
-                    onValueChange = {},
+                    value = review.value,
+                    onValueChange = { review.value = it },
                     placeholder = { Text("Review", color = MaterialTheme.colorScheme.onSurface) }
                 )
-//                ExposedDropdownMenuBox(
-//                    expanded = ratingExpanded.value,
-//                    modifier = Modifier
-//                        .clickable{ ratingExpanded.value = true },
-//                    onExpandedChange = { ratingExpanded.value != ratingExpanded.value }
-//                ) {
-//                    TextField(
-//                        value = selectedRating.value,
-//                        onValueChange = {},
-//                        readOnly = true,
-//                        modifier = Modifier.menuAnchor(),
-//                        trailingIcon = {
-//                            ExposedDropdownMenuDefaults.TrailingIcon(
-//                                expanded = ratingExpanded.value
-//                            )
-//                        }
-//                    )
-//                    ExposedDropdownMenu(
-//                        expanded = ratingExpanded.value,
-//                        onDismissRequest = { ratingExpanded.value = false }
-//                    ) {
-//                        repeat(5) {index ->
-//                            val rating = (index + 1).toString()
-//
-//                            DropdownMenuItem(
-//                                text = { Text(rating) },
-//                                onClick = {
-//                                    ratingExpanded.value = false
-//                                    selectedRating.value = rating
-//                                }
-//                            )
-//                        }
-//                    }
-//                }
+                Rating(
+                    rating = rating.intValue,
+                    starSize = 20.dp,
+                    onRatingChanged = { rating.intValue = it },
+                    modifier = Modifier
+                        .padding(vertical = 10.dp)
+                )
                 Row() {
-                    Button(onClick = onCancel) {
-                        Text(text = "Cancel")
-                    }
-                    Button(onClick = onSubmit) {
-                        Text(text = "Submit")
+                    Button(
+                        enabled = isTitleValid.value,
+                        onClick = { onSubmit(title.value, review.value, rating.intValue) }
+                    ) {
+                        Text(
+                            text = "Submit"
+                        )
                     }
                 }
             }

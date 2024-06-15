@@ -69,13 +69,12 @@ fun GamePage(
         }
     }
 
-
     if (showReviewDialog.value) {
         ReviewDialog(
-            onSubmit = {
-                println("Submit :)")
+            onSubmit = { title, description, rating ->
+                // @@ TODO: Implement comment submission
             },
-            onCancel = {
+            onDismissRequest = {
                 showReviewDialog.value = false
             }
         )

@@ -78,7 +78,7 @@ fun ReviewBlock(
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Rating(
-                    stars = review.rating,
+                    rating = review.rating,
                     modifier = Modifier
                         .alpha(0.5f)
                 )
