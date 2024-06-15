@@ -1,8 +1,7 @@
-package com.example.pixelpeppers.clients
+package com.example.pixelpeppers.services
 
 import com.example.pixelpeppers.coordinators.dataCoordinator.DataCoordinator
 import com.example.pixelpeppers.extensions.await
-import com.example.pixelpeppers.repositories.TwitchAuthRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -31,7 +30,7 @@ private object RequestInterceptor : Interceptor {
         if (accessToken == null || isAccessTokenExpired()) {
             // Make the token refresh request
             val refreshedToken = runBlocking {
-                TwitchAuthRepository.instance.refreshAccessToken()
+                UserService.instance.refreshAccessToken()
             }
 
             accessToken = refreshedToken.accessToken
@@ -45,10 +44,13 @@ private object RequestInterceptor : Interceptor {
 }
 
 
-object GamesClient {
-    private const val BASE_URL = "https://api.igdb.com/v4"
-    private val PLAIN = "text/plain".toMediaType()
-    private val client = OkHttpClient().newBuilder().addInterceptor(RequestInterceptor).build()
+class GamesService {
+    companion object {
+        val instance: GamesService by lazy(LazyThreadSafetyMode.SYNCHRONIZED) { GamesService() }
+        private const val BASE_URL = "https://api.igdb.com/v4"
+        private val PLAIN = "text/plain".toMediaType()
+        private val client = OkHttpClient().newBuilder().addInterceptor(RequestInterceptor).build()
+    }
     suspend fun getGenres(limit: Int = 18): Response = withContext(Dispatchers.IO) {
         val body = "limit $limit; fields name;".toRequestBody(PLAIN)
         val request = Request.Builder().url("$BASE_URL/genres").post(body).build()

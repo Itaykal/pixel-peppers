@@ -38,7 +38,6 @@ class DataCoordinator private constructor() {
 
     suspend fun initializeAsync(context: Context) {
         this.context = context
-        username = getUsername()
         accessToken = getAccessToken()
         accessTokenExpirationTime = getAccessTokenExpirationTime()
     }

@@ -7,17 +7,19 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 
-class ReviewsRepository private constructor() {
-    private val db = Firebase.firestore
+class ReviewRepository private constructor() {
+
     private val auth = Firebase.auth
 
     companion object {
-        val instance: ReviewsRepository by lazy(LazyThreadSafetyMode.SYNCHRONIZED) { ReviewsRepository() }
+        val instance: ReviewRepository by lazy(LazyThreadSafetyMode.SYNCHRONIZED) { ReviewRepository() }
         private const val REVIEWS_COLLECTION = "reviews"
+        private val collection = Firebase.firestore.collection(REVIEWS_COLLECTION)
+
     }
 
     fun addReview(createReview: CreateReview, callback: (id: String) -> Unit) {
-        val doc = db.collection(REVIEWS_COLLECTION).document()
+        val doc = collection.document()
         val currentUser = auth.currentUser!!
         val review = Review(
             id = doc.id,
@@ -35,7 +37,7 @@ class ReviewsRepository private constructor() {
     }
 
     fun deleteReview(reviewId: String, callback: () -> Unit) {
-        db.collection(REVIEWS_COLLECTION)
+        collection
             .document(reviewId)
             .delete()
             .addOnCompleteListener {
@@ -44,7 +46,7 @@ class ReviewsRepository private constructor() {
     }
 
     fun updateReview(reviewId: String, createReview: UpdateReview, callback: () -> Unit) {
-        db.collection(REVIEWS_COLLECTION)
+        collection
             .document(reviewId)
             .update(
                 "description", createReview.description,
@@ -57,7 +59,7 @@ class ReviewsRepository private constructor() {
     }
 
     fun getGamesReviews(gameId: Int, callback: (reviews: List<Review>) -> Unit) {
-        db.collection(REVIEWS_COLLECTION)
+        collection
             .whereEqualTo("gameId", gameId)
             .get()
             .addOnCompleteListener {

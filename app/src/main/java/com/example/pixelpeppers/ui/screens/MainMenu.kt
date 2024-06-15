@@ -26,10 +26,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.pixelpeppers.R
 import com.example.pixelpeppers.models.Game
-import com.example.pixelpeppers.repositories.GamesRepository
+import com.example.pixelpeppers.repositories.GameRepository
 import com.example.pixelpeppers.ui.components.CircleIconButton
 import com.example.pixelpeppers.ui.components.GameCarousell
 import com.example.pixelpeppers.ui.components.LargeGamePreview
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun MainMenu(
@@ -44,11 +45,12 @@ fun MainMenu(
     val topics = listOf<String>("tmp", "tmp2", "tmp3")
 
     LaunchedEffect(Unit) {
-        GamesRepository.instance.getGame(17000) {
+        println("MENUUUUUUU")
+        GameRepository.instance.getGame(17000).let {
             trendingGame.value = it
         }
         for (topic in topics) {
-            GamesRepository.instance.searchGames("stardew", limit = 20) {
+            GameRepository.instance.searchGames("stardew", limit = 20).let {
                 gamesMap[topic] = it
             }
         }

@@ -37,7 +37,7 @@ import com.example.pixelpeppers.R
 import com.example.pixelpeppers.models.Game
 import com.example.pixelpeppers.models.ImageSize
 import com.example.pixelpeppers.models.Review
-import com.example.pixelpeppers.repositories.GamesRepository
+import com.example.pixelpeppers.repositories.GameRepository
 import com.example.pixelpeppers.ui.components.GamePreview
 import com.example.pixelpeppers.ui.components.GenreTag
 import com.example.pixelpeppers.ui.components.ReviewBlock
@@ -96,7 +96,7 @@ fun GamePage(
 //        val reviews = remember { mutableStateListOf<Review>() }
 
         LaunchedEffect(Unit) {
-            GamesRepository.instance.getGame(gameID) {
+            GameRepository.instance.getGame(gameID).let {
                 game.value = it
             }
         }

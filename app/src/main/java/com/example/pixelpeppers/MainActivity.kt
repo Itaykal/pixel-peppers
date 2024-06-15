@@ -1,44 +1,54 @@
 package com.example.pixelpeppers
 
+import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
+import androidx.compose.material3.Text
+import androidx.compose.ui.graphics.Color
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pixelpeppers.coordinators.dataCoordinator.DataCoordinator
-import com.example.pixelpeppers.repositories.TwitchAuthRepository
+import com.example.pixelpeppers.models.User
+import com.example.pixelpeppers.services.UserService
 import com.example.pixelpeppers.ui.theme.PixelPeppersTheme
+import com.example.pixelpeppers.viewModels.GenreViewModel
+import com.example.pixelpeppers.viewModels.UserViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.runBlocking
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity(
 ) {
-    private lateinit var auth: FirebaseAuth
-
+    private val userViewModel: UserViewModel by viewModels()
     override fun onStart() {
         super.onStart()
-        val currentUser = auth.currentUser
         var route: Route = Route.Login
-        if (currentUser != null) {
+        if (userViewModel.user.value != null) {
             route = Route.Menu
         } else {
             val uri: Uri? = intent.data
             if (uri != null && uri.path.equals("/auth")) {
                 val code = uri.getQueryParameter("code")
                 if (code != null) {
-                    authenticateWithCode(code)
+                    userViewModel.loginWithCode(code)
                     route = Route.OnboardingIntro
                 }
             }
         }
         setContent {
             PixelPeppersTheme {
-                NavGraph(startDestination = route.route)
+                Text(text = route.route, color = Color.White)
+                NavGraph(
+                    startDestination = route.route,
+                )
             }
         }
 
@@ -48,16 +58,7 @@ class MainActivity : ComponentActivity(
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         installSplashScreen()
-        auth = Firebase.auth
         DataCoordinator.instance.initialize(baseContext)
-    }
-
-    private fun authenticateWithCode(code: String) {
-        CoroutineScope(Dispatchers.Main).launch {
-            TwitchAuthRepository.instance.authenticateWithTwitch(code) {
-                auth.signInWithCustomToken(it)
-            }
-        }
     }
 }
 
