@@ -51,7 +51,7 @@ fun Search(
         ) {
             PixelPeppersSearchBar(
                 onSearch = {searchQuery ->
-                    GamesRepository.searchGames(searchQuery, limit = 30) {
+                    GamesRepository.instance.searchGames(searchQuery, limit = 30) {
                         games.clear()
                         games.addAll(it)
                         resetLazyGrid()

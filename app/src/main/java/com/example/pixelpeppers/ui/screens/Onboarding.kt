@@ -64,12 +64,12 @@ fun Onboarding(
             PixelPeppersButton(
                 text = "Next",
                 onClick = {
-                if (page == 0) {
-                    navController.navigate(route = Route.OnboardingTags.route)
-                } else {
-                    navController.navigate(route = Route.Menu.route)
-                }
-            })
+                    if (page == 0) {
+                        navController.navigate(route = Route.OnboardingTags.route)
+                    } else {
+                        navController.navigate(route = Route.Menu.route)
+                    }
+                })
             if (page == 0) {
                 OnboardingIntro(
                     modifier = modifier
@@ -80,13 +80,12 @@ fun Onboarding(
                 OnboardingTags(
                     modifier = modifier
                         .padding(paddingValues)
-                        .fillMaxSize()
+                        .fillMaxSize(),
                 )
             }
         }
     }
 }
-
 
 
 @Composable
@@ -100,7 +99,7 @@ fun OnboardingTags(
     val loading = remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        GamesRepository.getGenres (limit = rows * columns) {
+        GamesRepository.instance.getGenres(limit = rows * columns) {
             genres.addAll(it)
             loading.value = false
         }
@@ -108,7 +107,7 @@ fun OnboardingTags(
 
 
     if (loading.value) {
-        Box (
+        Box(
             contentAlignment = Alignment.Center,
             modifier = modifier
         ) {
