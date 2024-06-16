@@ -1,6 +1,7 @@
 package com.example.pixelpeppers
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -13,20 +14,20 @@ import com.example.pixelpeppers.ui.screens.TempPage
 
 @Composable
 fun NavGraph(
-    startDestination: String
+    startDestination: String,
 ) {
     val navController = rememberNavController()
-    val navigateGame: (Game) -> Unit = { game: Game -> navController.navigate(route = "${Route.Game.route}/${game.id}") }
-
+    val navigateGame: (Game) -> Unit =
+        { game: Game -> navController.navigate(route = "${Route.Game.route}/${game.id}") }
     NavHost(navController = navController, startDestination = startDestination) {
         composable(
             route = Route.OnboardingIntro.route
-        ){
+        ) {
             Onboarding(page = 0, navController = navController)
         }
         composable(
             route = Route.OnboardingTags.route
-        ){
+        ) {
             Onboarding(page = 1, navController = navController)
         }
         composable(
@@ -36,6 +37,7 @@ fun NavGraph(
                 onGameClick = navigateGame,
                 onSearchClick = { navController.navigate(route = Route.Search.route) },
                 onAccountClick = { navController.navigate(route = Route.Login.route) },
+                returnToOnboarding= { navController.navigate(route=Route.OnboardingIntro.route)}
             )
         }
         composable(

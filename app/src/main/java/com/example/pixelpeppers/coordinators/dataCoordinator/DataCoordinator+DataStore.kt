@@ -30,16 +30,3 @@ suspend fun DataCoordinator.getAccessTokenExpirationTime(): Long {
     return context.dataStore.data.firstOrNull()?.get(PreferencesKeys.accessTokenExpirationTime)
         ?: defaultAccessTokenExpirationTimeValue
 }
-
-suspend fun DataCoordinator.setUsername(username: String) {
-    val context = this.context ?: return
-    context.dataStore.edit { preferences ->
-        preferences[PreferencesKeys.usernameKey] = username
-    }
-}
-
-suspend fun DataCoordinator.getUsername(): String? {
-    val context = this.context ?: return defaultUsernameValue
-    return context.dataStore.data.firstOrNull()?.get(PreferencesKeys.usernameKey)
-        ?: defaultUsernameValue
-}

@@ -20,9 +20,6 @@ class DataCoordinator private constructor() {
     var accessTokenExpirationTime: Long = 0
     val defaultAccessTokenExpirationTimeValue: Long = 0
 
-    var username: String? = null
-    val defaultUsernameValue: String? = null
-
     private val USER_PREFERENCES_NAME = "token"
     val Context.dataStore by preferencesDataStore(
         name = USER_PREFERENCES_NAME
@@ -38,7 +35,6 @@ class DataCoordinator private constructor() {
 
     suspend fun initializeAsync(context: Context) {
         this.context = context
-        username = getUsername()
         accessToken = getAccessToken()
         accessTokenExpirationTime = getAccessTokenExpirationTime()
     }

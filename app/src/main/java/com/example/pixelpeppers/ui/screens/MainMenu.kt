@@ -17,40 +17,41 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.pixelpeppers.R
 import com.example.pixelpeppers.models.Game
-import com.example.pixelpeppers.repositories.GamesRepository
 import com.example.pixelpeppers.ui.components.CircleIconButton
 import com.example.pixelpeppers.ui.components.GameCarousell
 import com.example.pixelpeppers.ui.components.LargeGamePreview
+import com.example.pixelpeppers.viewModels.GameViewModel
+import com.example.pixelpeppers.viewModels.UserViewModel
 
 @Composable
 fun MainMenu(
     onGameClick: (Game) -> Unit,
     onAccountClick: () -> Unit,
     onSearchClick: () -> Unit,
+    returnToOnboarding: () -> Unit,
     modifier: Modifier = Modifier,
+    gameViewModel: GameViewModel = hiltViewModel(),
+    userViewModel: UserViewModel = hiltViewModel(),
 ) {
+    val user by userViewModel.user.observeAsState()
     val state = rememberLazyListState()
-    val trendingGame = remember { mutableStateOf<Game?>(null) }
-    val gamesMap = remember { mutableStateMapOf<String, List<Game>>() }
-    val topics = listOf<String>("tmp", "tmp2", "tmp3")
+    val trendingGame by gameViewModel.getGameById(17000).observeAsState()
+    val topics = listOf("stardew", "harry potter", "spider-man")
+    val gamesMap = topics.associateWith { gameViewModel.getGamesBySearch(it) }
 
     LaunchedEffect(Unit) {
-        GamesRepository.instance.getGame(17000) {
-            trendingGame.value = it
-        }
+        gameViewModel.refreshGamesByID(17000)
         for (topic in topics) {
-            GamesRepository.instance.searchGames("stardew", limit = 20) {
-                gamesMap[topic] = it
-            }
+            gameViewModel.refreshGamesBySearch(topic)
         }
     }
     Box(
@@ -59,10 +60,12 @@ fun MainMenu(
             .background(MaterialTheme.colorScheme.background)
             .fillMaxSize(),
     ) {
-        if (trendingGame.value == null || gamesMap.size != topics.size) {
+        if (trendingGame == null || gamesMap.size != topics.size || user == null) {
             LoadingAnimation()
+        } else if (!user!!.onboardingComplete) {
+            returnToOnboarding()
         } else {
-            LazyColumn (
+            LazyColumn(
                 state = state,
                 verticalArrangement = Arrangement.spacedBy(30.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -99,37 +102,42 @@ fun MainMenu(
                         )
                     }
                     // highlighted game
-                    Row (
+                    Row(
                         verticalAlignment = Alignment.Top,
                     ) {
                         LargeGamePreview(
-                            game = trendingGame.value!!,
-                            onClick = { onGameClick(trendingGame.value!!) },
+                            game = trendingGame!!,
+                            onClick = { onGameClick(trendingGame!!) },
                         )
                     }
                 }
 
                 items(gamesMap.keys.toList()) { key ->
-                    Row (
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        Column {
-                            Text(
-                                text = key,
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onBackground,
-                                maxLines = 1,
-                                modifier = Modifier
-                                    .padding(start = 8.dp)
-                            )
+                    val games by gamesMap[key]!!.observeAsState()
+                    if (games.isNullOrEmpty()) {
+                        LoadingAnimation()
+                    } else {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        ) {
+                            Column {
+                                Text(
+                                    text = key,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    maxLines = 1,
+                                    modifier = Modifier
+                                        .padding(start = 8.dp)
+                                )
 
-                            GameCarousell(
-                                games = gamesMap[key]!!,
-                                onGameClick = onGameClick,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                            )
+                                GameCarousell(
+                                    games = games!!,
+                                    onGameClick = onGameClick,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                )
+                            }
                         }
                     }
                 }
