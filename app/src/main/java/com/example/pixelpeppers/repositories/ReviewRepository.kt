@@ -1,24 +1,33 @@
 package com.example.pixelpeppers.repositories
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import com.example.pixelpeppers.models.CreateReview
 import com.example.pixelpeppers.models.Review
 import com.example.pixelpeppers.models.UpdateReview
+import com.example.pixelpeppers.offlineCaching.daos.ReviewDao
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
-class ReviewRepository private constructor() {
+class ReviewRepository(private val reviewDao: ReviewDao) {
+
+    val allReviews = reviewDao.getAllReviews()
 
     private val auth = Firebase.auth
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
+
 
     companion object {
-        val instance: ReviewRepository by lazy(LazyThreadSafetyMode.SYNCHRONIZED) { ReviewRepository() }
         private const val REVIEWS_COLLECTION = "reviews"
         private val collection = Firebase.firestore.collection(REVIEWS_COLLECTION)
-
     }
 
-    fun addReview(createReview: CreateReview, callback: (id: String) -> Unit) {
+    suspend fun addReview(createReview: CreateReview) {
         val doc = collection.document()
         val currentUser = auth.currentUser!!
         val review = Review(
@@ -30,42 +39,57 @@ class ReviewRepository private constructor() {
             authorId = currentUser.uid,
             authorDisplayName = currentUser.displayName!!,
         )
-        doc.set(review)
-            .addOnCompleteListener {
-                callback(review.id)
-            }
+        doc.set(review).await()
+        reviewDao.insertAll(listOf(review))
     }
 
-    fun deleteReview(reviewId: String, callback: () -> Unit) {
+    suspend fun deleteReview(reviewId: String) {
         collection
             .document(reviewId)
             .delete()
-            .addOnCompleteListener {
-                callback()
-            }
+            .await()
+        reviewDao.deleteReview(reviewId)
     }
 
-    fun updateReview(reviewId: String, createReview: UpdateReview, callback: () -> Unit) {
+    suspend fun updateReview(reviewId: String, updateReview: UpdateReview) {
         collection
             .document(reviewId)
             .update(
-                "description", createReview.description,
-                "rating", createReview.rating,
-                "title", createReview.title
+                "description", updateReview.description,
+                "rating", updateReview.rating,
+                "title", updateReview.title
             )
-            .addOnCompleteListener {
-                callback()
-            }
+            .await()
+        reviewDao.updateReview(
+            reviewId,
+            updateReview.rating,
+            updateReview.title,
+            updateReview.description,
+        )
     }
 
-    fun getGamesReviews(gameId: Int, callback: (reviews: List<Review>) -> Unit) {
-        collection
-            .whereEqualTo("gameId", gameId)
-            .get()
-            .addOnCompleteListener {
-                val reviews = it.result.toObjects(Review::class.java)
-                callback(reviews)
+    fun getReviewsByGameId(gameId: Int): LiveData<List<Review>> {
+        return MediatorLiveData<List<Review>>().apply {
+            addSource(allReviews) {
+                this.value = it.filter { review -> review.gameId == gameId }
             }
+        }
+    }
+
+    suspend fun refreshReviewsByGameId(gameId: Int): LiveData<List<Review>> {
+        try {
+            val reviews = collection
+                .whereEqualTo("gameId", gameId)
+                .get()
+                .await()
+                .toObjects(Review::class.java)
+            coroutineScope.launch(Dispatchers.IO) {
+                reviewDao.insertAll(reviews)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return reviewDao.getReviewsByGame(gameId)
     }
 
 
