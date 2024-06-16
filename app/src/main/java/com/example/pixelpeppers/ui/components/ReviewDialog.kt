@@ -26,10 +26,10 @@ fun ReviewDialog(
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit = {},
 ) {
-    var rating = remember { mutableIntStateOf(1) } //default rating will be 1
-    var isTitleValid = remember { mutableStateOf(false) }
-    var title = remember { mutableStateOf("") }
-    var review = remember { mutableStateOf("") }
+    val rating = remember { mutableIntStateOf(1) } //default rating will be 1
+    val isTitleValid = remember { mutableStateOf(false) }
+    val title = remember { mutableStateOf("") }
+    val review = remember { mutableStateOf("") }
 
     Dialog(onDismissRequest = onDismissRequest) {
         Box(

@@ -142,6 +142,14 @@ fun GamePage(
                         authorId = "1",
                         authorDisplayName = "torrell8",
                         gameId = 17000,
+                        mediaURLs = listOf(
+                            "https://images.unsplash.com/photo-1551963831-b3b1ca40c98e",
+                            "https://images.unsplash.com/photo-1551782450-a2132b4ba21d",
+                            "https://images.unsplash.com/photo-1551782450-a2132b4ba21d",
+                            "https://images.unsplash.com/photo-1551782450-a2132b4ba21d",
+                            "https://images.unsplash.com/photo-1551782450-a2132b4ba21d",
+                            "https://images.unsplash.com/photo-1551782450-a2132b4ba21d",
+                        )
                     ))
 
                     item {
