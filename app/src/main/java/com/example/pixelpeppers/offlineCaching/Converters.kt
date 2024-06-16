@@ -1,8 +1,8 @@
 package com.example.pixelpeppers.offlineCaching
 
 import androidx.room.TypeConverter
-import com.example.pixelpeppers.models.Cover
 import com.example.pixelpeppers.models.Genre
+import com.example.pixelpeppers.models.Image
 
 class Converters {
     @TypeConverter
@@ -15,23 +15,23 @@ class Converters {
         return genre.name
     }
 
+//    @TypeConverter
+//    fun coverFromString(value: String): Cover {
+//        return Cover(value)
+//    }
+//
+//    @TypeConverter
+//    fun coverToString(cover: Cover): String {
+//        return cover.url
+//    }
+
     @TypeConverter
-    fun coverFromString(value: String): Cover {
-        return Cover(value)
+    fun listOfImagesToString(l: List<Image>): String {
+        return l.joinToString(",") { it.url }
     }
 
     @TypeConverter
-    fun coverToString(cover: Cover): String {
-        return cover.url
-    }
-
-    @TypeConverter
-    fun listToString(l: List<String>): String {
-        return l.joinToString(",")
-    }
-
-    @TypeConverter
-    fun listFromString(value: String): List<String> {
-        return value.split(",")
+    fun listOfImagesFromString(value: String): List<Image> {
+        return value.split(",").map { Image(it) }
     }
 }

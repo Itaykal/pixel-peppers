@@ -135,9 +135,9 @@ fun ReviewBlock(
                             .fillMaxWidth()
                             .padding(top = 10.dp, bottom = 10.dp),
                     ) {
-                        items(review.mediaURLs) { url ->
+                        items(review.mediaURLs) { image ->
                             GlideImage(
-                                model = url,
+                                model = image.url,
                                 contentDescription = "",
                                 contentScale = ContentScale.Crop,
                                 colorFilter = PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY).asComposeColorFilter(),
@@ -146,7 +146,7 @@ fun ReviewBlock(
                                     .clip(MaterialTheme.shapes.large)
                                     .clickable {
                                         showImageDialog.value = true
-                                        zoomedImage.value = url
+                                        zoomedImage.value = image.url
                                     }
                             )
                         }

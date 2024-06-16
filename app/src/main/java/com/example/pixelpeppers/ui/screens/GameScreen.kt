@@ -35,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.pixelpeppers.R
 import com.example.pixelpeppers.models.Game
+import com.example.pixelpeppers.models.Image
 import com.example.pixelpeppers.models.ImageSize
 import com.example.pixelpeppers.models.Review
 import com.example.pixelpeppers.repositories.GameRepository
@@ -114,6 +115,7 @@ fun GamePage(
                     verticalArrangement = Arrangement.spacedBy(0.dp),
                     horizontalAlignment = Alignment.Start,
                     modifier = Modifier
+                        .background(MaterialTheme.colorScheme.background)
                         .fillMaxWidth()
                 ) {
                     item {
@@ -143,12 +145,12 @@ fun GamePage(
                         authorDisplayName = "torrell8",
                         gameId = 17000,
                         mediaURLs = listOf(
-                            "https://images.unsplash.com/photo-1551963831-b3b1ca40c98e",
-                            "https://images.unsplash.com/photo-1551782450-a2132b4ba21d",
-                            "https://images.unsplash.com/photo-1551782450-a2132b4ba21d",
-                            "https://images.unsplash.com/photo-1551782450-a2132b4ba21d",
-                            "https://images.unsplash.com/photo-1551782450-a2132b4ba21d",
-                            "https://images.unsplash.com/photo-1551782450-a2132b4ba21d",
+                            Image("https://images.unsplash.com/photo-1551963831-b3b1ca40c98e"),
+                            Image("https://images.unsplash.com/photo-1551782450-a2132b4ba21d"),
+                            Image("https://images.unsplash.com/photo-1551782450-a2132b4ba21d"),
+                            Image("https://images.unsplash.com/photo-1551782450-a2132b4ba21d"),
+                            Image("https://images.unsplash.com/photo-1551782450-a2132b4ba21d"),
+                            Image("https://images.unsplash.com/photo-1551782450-a2132b4ba21d"),
                         )
                     ))
 
@@ -164,7 +166,8 @@ fun GamePage(
                         Column (
                             verticalArrangement = Arrangement.spacedBy(5.dp),
                             modifier = Modifier
-                                .padding(start = 10.dp, bottom = 10.dp)
+                                .background(MaterialTheme.colorScheme.background)
+                                .fillMaxWidth()
                         ) {
                             Text(
                                 text = gameRes.name,
@@ -172,9 +175,13 @@ fun GamePage(
                                 style = MaterialTheme.typography.headlineMedium,
                                 fontWeight = FontWeight.ExtraBold,
                                 maxLines = 1,
+                                modifier = Modifier
+                                    .padding(start = 10.dp)
                             )
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(5.dp),
+                                modifier = Modifier
+                                    .padding(start = 10.dp, bottom = 10.dp)
                             ) {
                                 repeat(3) { index ->
                                     if (index < game.value!!.genres.size) {
