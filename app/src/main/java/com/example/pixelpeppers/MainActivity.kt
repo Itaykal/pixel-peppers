@@ -25,6 +25,7 @@ class MainActivity : ComponentActivity(
         var route: Route = Route.Login
         val currentUser = Firebase.auth.currentUser
         if (currentUser != null) {
+            userViewModel.refreshUser()
             route = Route.Menu
         } else {
             val uri: Uri? = intent.data

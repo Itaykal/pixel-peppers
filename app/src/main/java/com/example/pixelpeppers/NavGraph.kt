@@ -19,7 +19,6 @@ fun NavGraph(
     val navController = rememberNavController()
     val navigateGame: (Game) -> Unit =
         { game: Game -> navController.navigate(route = "${Route.Game.route}/${game.id}") }
-
     NavHost(navController = navController, startDestination = startDestination) {
         composable(
             route = Route.OnboardingIntro.route
@@ -38,6 +37,7 @@ fun NavGraph(
                 onGameClick = navigateGame,
                 onSearchClick = { navController.navigate(route = Route.Search.route) },
                 onAccountClick = { navController.navigate(route = Route.Login.route) },
+                returnToOnboarding= { navController.navigate(route=Route.OnboardingIntro.route)}
             )
         }
         composable(

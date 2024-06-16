@@ -30,15 +30,19 @@ import com.example.pixelpeppers.ui.components.CircleIconButton
 import com.example.pixelpeppers.ui.components.GameCarousell
 import com.example.pixelpeppers.ui.components.LargeGamePreview
 import com.example.pixelpeppers.viewModels.GameViewModel
+import com.example.pixelpeppers.viewModels.UserViewModel
 
 @Composable
 fun MainMenu(
     onGameClick: (Game) -> Unit,
     onAccountClick: () -> Unit,
     onSearchClick: () -> Unit,
+    returnToOnboarding: () -> Unit,
     modifier: Modifier = Modifier,
-    gameViewModel: GameViewModel = hiltViewModel()
+    gameViewModel: GameViewModel = hiltViewModel(),
+    userViewModel: UserViewModel = hiltViewModel(),
 ) {
+    val user by userViewModel.user.observeAsState()
     val state = rememberLazyListState()
     val trendingGame by gameViewModel.getGameById(17000).observeAsState()
     val topics = listOf("stardew", "harry potter", "spider-man")
@@ -56,8 +60,10 @@ fun MainMenu(
             .background(MaterialTheme.colorScheme.background)
             .fillMaxSize(),
     ) {
-        if (trendingGame == null || gamesMap.size != topics.size) {
+        if (trendingGame == null || gamesMap.size != topics.size || user == null) {
             LoadingAnimation()
+        } else if (!user!!.onboardingComplete) {
+            returnToOnboarding()
         } else {
             LazyColumn(
                 state = state,

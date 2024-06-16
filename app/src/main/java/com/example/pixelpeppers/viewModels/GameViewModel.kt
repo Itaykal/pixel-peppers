@@ -33,10 +33,16 @@ class GameViewModel
         }
     }
 
-    fun refreshGamesBySearch(query: String) {
+    fun refreshGamesBySearchDebounce(query: String) {
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             delay(500)
+            repository.refreshGamesBySearch(query)
+        }
+    }
+
+    fun refreshGamesBySearch(query: String) {
+        viewModelScope.launch {
             repository.refreshGamesBySearch(query)
         }
     }

@@ -8,6 +8,7 @@ import com.example.pixelpeppers.coordinators.dataCoordinator.updateAccessToken
 import com.example.pixelpeppers.coordinators.dataCoordinator.updateTokenExpires
 import com.example.pixelpeppers.extensions.await
 import com.example.pixelpeppers.models.AccessTokenResponse
+import com.example.pixelpeppers.models.UpdateUser
 import com.example.pixelpeppers.models.User
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -48,10 +49,9 @@ class UserClient(private val okHttpClient: OkHttpClient) {
     }
 
     suspend fun getUser(id: String? = null): User {
-        val id = id ?: auth.currentUser?.uid
         return User.fromFirestoreMap(
             collection
-                .whereEqualTo("id", id)
+                .whereEqualTo("id", id ?: auth.currentUser!!.uid)
                 .get()
                 .await()
                 .toList()[0].data
@@ -83,5 +83,14 @@ class UserClient(private val okHttpClient: OkHttpClient) {
         DataCoordinator.instance.updateAccessToken(accessTokenResponse.accessToken)
         DataCoordinator.instance.updateTokenExpires(accessTokenResponse.expiresIn)
         accessTokenResponse
+    }
+
+    suspend fun updateUser(updateUser: UpdateUser) {
+        val id = auth.currentUser!!.uid
+        collection
+            .document(id)
+            .update(
+                updateUser.toMap()
+            ).await()
     }
 }

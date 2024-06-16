@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import com.example.pixelpeppers.models.User
 import com.example.pixelpeppers.offlineCaching.daos.UserDao
 import com.example.pixelpeppers.clients.UserClient
+import com.example.pixelpeppers.models.UpdateUser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,6 +29,22 @@ class UserRepository(
             }
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+    }
+
+    suspend fun updateUser(updateUser: UpdateUser) {
+        if (user.value != null) {
+            userClient.updateUser(updateUser)
+            coroutineScope.launch(Dispatchers.IO) {
+                userDao.insert(updateUser.updateUser(user.value!!))
+            }
+        }
+    }
+
+    suspend fun refreshUser() {
+        val refreshedUser = userClient.getUser(user.value?.id)
+        coroutineScope.launch(Dispatchers.IO) {
+            userDao.insert(refreshedUser)
         }
     }
 }

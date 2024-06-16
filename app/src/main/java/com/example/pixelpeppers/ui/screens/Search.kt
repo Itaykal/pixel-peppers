@@ -52,7 +52,7 @@ fun Search(
             PixelPeppersSearchBar(
                 onSearch = {
                     searchQuery.value = it
-                    gameViewModel.refreshGamesBySearch(it)
+                    gameViewModel.refreshGamesBySearchDebounce(it)
                 }
             )
             if (games == null) {
