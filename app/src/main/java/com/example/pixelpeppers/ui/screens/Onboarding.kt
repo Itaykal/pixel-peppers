@@ -73,7 +73,7 @@ fun Onboarding(
             // TODO: Add loader here
             LoadingAnimation()
         }
-    } else if (userViewModel.user.value!!.onboardingComplete) {
+    } else if (user!!.onboardingComplete) {
         navController.navigate(route = Route.Menu.route)
     } else {
         Scaffold(

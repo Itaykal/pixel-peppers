@@ -1,5 +1,6 @@
 package com.example.pixelpeppers.ui.screens
 
+import LoadingAnimation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,16 +13,19 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.pixelpeppers.models.Game
-import com.example.pixelpeppers.repositories.GameRepository
 import com.example.pixelpeppers.ui.components.GamePreview
 import com.example.pixelpeppers.ui.components.PixelPeppersSearchBar
+import com.example.pixelpeppers.viewModels.GameViewModel
 import kotlinx.coroutines.launch
 
 
@@ -29,15 +33,11 @@ import kotlinx.coroutines.launch
 fun Search(
     onGameClick: (Game) -> Unit,
     modifier: Modifier = Modifier,
+    gameViewModel: GameViewModel = hiltViewModel()
 ) {
-    val games = remember { mutableStateListOf<Game?>(null) }
+    val searchQuery = remember { mutableStateOf("") }
+    val games by gameViewModel.getGamesBySearch(searchQuery.value).observeAsState()
     val searchState = rememberLazyGridState()
-    val corutineScope = rememberCoroutineScope()
-    val resetLazyGrid: () -> Unit = {
-        corutineScope.launch {
-            searchState.scrollToItem(0)
-        }
-    }
 
     Box(
         modifier = modifier
@@ -45,28 +45,26 @@ fun Search(
             .fillMaxSize()
             .padding(top = 16.dp, bottom = 16.dp),
     ) {
-        Column (
+        Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             PixelPeppersSearchBar(
-                onSearch = {searchQuery ->
-//                    GameRepository.instance.searchGames(searchQuery, limit = 30) {
-//                        games.clear()
-//                        games.addAll(it)
-//                        resetLazyGrid()
-//                    }
+                onSearch = {
+                    searchQuery.value = it
+                    gameViewModel.refreshGamesBySearch(it)
                 }
             )
-
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                state = searchState
-            ) {
-                items(games) {
-                    if (it != null) {
+            if (games == null) {
+                LoadingAnimation()
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    state = searchState
+                ) {
+                    items(games!!) {
                         GamePreview(
                             game = it,
                             modifier = modifier,

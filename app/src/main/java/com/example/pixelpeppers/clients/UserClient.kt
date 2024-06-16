@@ -1,4 +1,4 @@
-package com.example.pixelpeppers.services
+package com.example.pixelpeppers.clients
 
 import android.content.Context
 import android.content.Intent
@@ -15,18 +15,15 @@ import com.google.firebase.firestore.firestore
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.functions.functions
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
 
-class UserService private constructor() {
-    private val client = OkHttpClient().newBuilder().build()
+class UserClient(private val okHttpClient: OkHttpClient) {
 
     companion object {
-        val instance: UserService by lazy(LazyThreadSafetyMode.SYNCHRONIZED) { UserService() }
         private const val USERS_COLLECTION = "users"
         private const val PIXEL_PEPPERS = "https://pixelpeppers.co.il"
         private const val ORIGIN_HEADER = "origin"
@@ -74,7 +71,7 @@ class UserService private constructor() {
             .url(url)
             .addHeader(ORIGIN_HEADER, PIXEL_PEPPERS)
             .build()
-        client.newCall(request).await().body?.string() ?: ""
+        okHttpClient.newCall(request).await().body?.string() ?: ""
     }
 
     suspend fun refreshAccessToken(): AccessTokenResponse = withContext(Dispatchers.IO) {

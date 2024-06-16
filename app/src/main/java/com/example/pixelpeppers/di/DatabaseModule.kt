@@ -3,6 +3,7 @@ package com.example.pixelpeppers.di
 import android.content.Context
 import androidx.room.Room
 import com.example.pixelpeppers.offlineCaching.PixelPeppersDatabase
+import com.example.pixelpeppers.offlineCaching.daos.GameDao
 import com.example.pixelpeppers.offlineCaching.daos.GenreDao
 import com.example.pixelpeppers.offlineCaching.daos.ImageDao
 import com.example.pixelpeppers.offlineCaching.daos.ReviewDao
@@ -36,6 +37,11 @@ object DatabaseModule {
     @Provides
     fun provideReviewDao(appDatabase: PixelPeppersDatabase): ReviewDao {
         return appDatabase.reviewDao()
+    }
+
+    @Provides
+    fun provideGameDao(appDatabase: PixelPeppersDatabase): GameDao {
+        return appDatabase.gameDao()
     }
 
     @Provides

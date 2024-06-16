@@ -9,6 +9,7 @@ import com.example.pixelpeppers.models.Genre
 import com.example.pixelpeppers.models.Image
 import com.example.pixelpeppers.models.Review
 import com.example.pixelpeppers.models.User
+import com.example.pixelpeppers.offlineCaching.daos.GameDao
 import com.example.pixelpeppers.offlineCaching.daos.GenreDao
 import com.example.pixelpeppers.offlineCaching.daos.ImageDao
 import com.example.pixelpeppers.offlineCaching.daos.ReviewDao
@@ -25,6 +26,7 @@ abstract class PixelPeppersDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun reviewDao(): ReviewDao
     abstract fun imageDao(): ImageDao
+    abstract fun gameDao(): GameDao
 
     companion object {
         @Volatile
