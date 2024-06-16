@@ -18,6 +18,19 @@ class ImageViewModel
     private val repository: ImageRepository,
 ) : ViewModel() {
 
+    fun getImage(id: String?): LiveData<Image> {
+        if (id == null) {
+            return MutableLiveData()
+        }
+       return repository.getImage(id)
+    }
+
+    suspend fun refreshImage(id: String) {
+        viewModelScope.launch {
+            repository.refreshImage(id)
+        }
+    }
+
     fun createImage(imageUri: Uri): String{
         var id = ""
         viewModelScope.launch {

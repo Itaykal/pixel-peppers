@@ -41,6 +41,8 @@ import com.example.pixelpeppers.ui.components.PageIndicator
 import com.example.pixelpeppers.ui.components.PixelPeppersButton
 import com.example.pixelpeppers.viewModels.GenreViewModel
 import com.example.pixelpeppers.viewModels.UserViewModel
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 var g = Game(
     id = 17000,
@@ -57,7 +59,7 @@ fun Onboarding(
     navigateToMenu: () -> Unit,
 ) {
 
-    val user by userViewModel.user.observeAsState()
+    val user by userViewModel.getUser().observeAsState()
     val page = remember { mutableStateOf(0) }
     LaunchedEffect(user) {
         if (user != null) {
@@ -75,7 +77,7 @@ fun Onboarding(
         }
     } else if (page.value >= 2) {
         navigateToMenu()
-        userViewModel.updateUser(UpdateUser(onboardingComplete = true))
+        userViewModel.updateOnBoarding(user!!.id, true)
     } else {
         Scaffold(
             modifier = modifier
