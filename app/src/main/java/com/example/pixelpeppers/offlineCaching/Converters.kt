@@ -24,4 +24,14 @@ class Converters {
     fun coverToString(cover: Cover): String {
         return cover.url
     }
+
+    @TypeConverter
+    fun listToString(l: List<String>): String {
+        return l.joinToString(",")
+    }
+
+    @TypeConverter
+    fun listFromString(value: String): List<String> {
+        return value.split(",")
+    }
 }

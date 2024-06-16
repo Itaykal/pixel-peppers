@@ -1,10 +1,8 @@
 package com.example.pixelpeppers.di
 
-import com.example.pixelpeppers.offlineCaching.daos.GameDao
 import com.example.pixelpeppers.offlineCaching.daos.GenreDao
 import com.example.pixelpeppers.offlineCaching.daos.ReviewDao
 import com.example.pixelpeppers.offlineCaching.daos.UserDao
-import com.example.pixelpeppers.repositories.GameRepository
 import com.example.pixelpeppers.repositories.GenreRepository
 import com.example.pixelpeppers.repositories.ReviewRepository
 import com.example.pixelpeppers.repositories.UserRepository
@@ -34,11 +32,5 @@ object AppModule {
     @Provides
     fun provideReviewRepository(reviewDao: ReviewDao): ReviewRepository {
         return ReviewRepository(reviewDao)
-    }
-
-    @Singleton
-    @Provides
-    fun provideGameRepository(gameDao: GameDao): GameRepository {
-        return GameRepository(gameDao)
     }
 }

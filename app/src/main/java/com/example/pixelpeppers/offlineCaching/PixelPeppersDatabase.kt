@@ -5,7 +5,6 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.example.pixelpeppers.models.Game
 import com.example.pixelpeppers.models.Genre
 import com.example.pixelpeppers.models.Review
 import com.example.pixelpeppers.models.User
@@ -14,7 +13,7 @@ import com.example.pixelpeppers.offlineCaching.daos.ReviewDao
 import com.example.pixelpeppers.offlineCaching.daos.UserDao
 
 @Database(
-    entities = [Genre::class, User::class, Review::class, Game::class],
+    entities = [Genre::class, User::class, Review::class],
     version = 1,
     exportSchema = false
 )

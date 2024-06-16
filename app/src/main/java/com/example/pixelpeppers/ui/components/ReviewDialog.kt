@@ -1,5 +1,7 @@
 package com.example.pixelpeppers.ui.components
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +32,11 @@ fun ReviewDialog(
     val isTitleValid = remember { mutableStateOf(false) }
     val title = remember { mutableStateOf("") }
     val review = remember { mutableStateOf("") }
+    val galleryLauncher =  rememberLauncherForActivityResult(GetContent()) { imageUri ->
+        imageUri?.let {
+            // @@ TODO: viewModel.addImageToStorage(imageUri)
+        }
+    }
 
     Dialog(onDismissRequest = onDismissRequest) {
         Box(
@@ -65,6 +72,13 @@ fun ReviewDialog(
                     modifier = Modifier
                         .padding(vertical = 10.dp)
                 )
+                Button(onClick = {
+                    galleryLauncher.launch("image/*")
+                }) {
+                    Text(
+                        text = "Add Images",
+                    )
+                }
                 Row() {
                     Button(
                         enabled = isTitleValid.value,

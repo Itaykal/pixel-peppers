@@ -38,6 +38,7 @@ class ReviewRepository(private val reviewDao: ReviewDao) {
             title = createReview.title,
             authorId = currentUser.uid,
             authorDisplayName = currentUser.displayName!!,
+            mediaURLs = createReview.mediaURLs,
         )
         doc.set(review).await()
         reviewDao.insertAll(listOf(review))
