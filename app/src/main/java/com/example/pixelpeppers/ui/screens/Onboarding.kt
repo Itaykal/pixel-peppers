@@ -34,6 +34,7 @@ import com.example.pixelpeppers.Route
 import com.example.pixelpeppers.models.Cover
 import com.example.pixelpeppers.models.Game
 import com.example.pixelpeppers.models.Genre
+import com.example.pixelpeppers.models.UpdateUser
 import com.example.pixelpeppers.ui.components.GameCarousell
 import com.example.pixelpeppers.ui.components.GenreTag
 import com.example.pixelpeppers.ui.components.PageIndicator
@@ -58,7 +59,6 @@ fun Onboarding(
 ) {
     val user by userViewModel.user.observeAsState()
     LaunchedEffect(user) {
-        println("Launched Effect ${user?.id}")
         if (user != null) {
             genreViewModel.refreshGenres()
         }
@@ -70,11 +70,8 @@ fun Onboarding(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            // TODO: Add loader here
             LoadingAnimation()
         }
-    } else if (user!!.onboardingComplete) {
-        navController.navigate(route = Route.Menu.route)
     } else {
         Scaffold(
             modifier = modifier
@@ -93,6 +90,7 @@ fun Onboarding(
                             navController.navigate(route = Route.OnboardingTags.route)
                         } else {
                             navController.navigate(route = Route.Menu.route)
+                            userViewModel.updateUser(UpdateUser(onboardingComplete = true))
                         }
                     })
                 if (page == 0) {
@@ -130,7 +128,6 @@ fun OnboardingTags(
             contentAlignment = Alignment.Center,
             modifier = modifier
         ) {
-            // TODO: Add loader here
             LoadingAnimation()
         }
     } else {

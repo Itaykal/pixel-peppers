@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -22,9 +25,6 @@ fun TempPage(
     navController: NavController,
     userViewModel: UserViewModel = hiltViewModel()
 ) {
-    if (DataCoordinator.instance.accessToken != null) {
-        navController.navigate(Route.OnboardingIntro.route)
-    }
     Box(
         modifier = modifier
             .fillMaxSize()
