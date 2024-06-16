@@ -79,6 +79,10 @@ class ReviewRepository(private val reviewDao: ReviewDao) {
         return reviewDao.getReviewsByGame(gameId)
     }
 
+    fun getReviewsByUserId(UserId: String): LiveData<List<Review>> {
+        return reviewDao.getReviewsByUserID(UserId)
+    }
+
     suspend fun refreshReviewsByGameId(gameId: Int) {
         try {
             val reviews = collection
