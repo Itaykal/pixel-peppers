@@ -82,7 +82,7 @@ fun MainMenu(
                             .padding(start = 8.dp, end = 8.dp)
                     ) {
                         Text(
-                            text = "Hey, User",
+                            text = "Hey, ${user!!.displayName}",
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onBackground,
                             maxLines = 1,

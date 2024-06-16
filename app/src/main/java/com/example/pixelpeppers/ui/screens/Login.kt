@@ -32,13 +32,8 @@ import com.example.pixelpeppers.viewModels.UserViewModel
 @Composable
 fun Login(
     modifier: Modifier = Modifier,
-    navController: NavController,
     userViewModel: UserViewModel = hiltViewModel()
 ) {
-    if (DataCoordinator.instance.accessToken != null) {
-        // @@ TODO: Remove navcontroller
-        navController.navigate(Route.OnboardingIntro.route)
-    }
     Box(
         modifier = modifier
             .fillMaxSize()
