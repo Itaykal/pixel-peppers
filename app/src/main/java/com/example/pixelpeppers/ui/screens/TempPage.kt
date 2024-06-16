@@ -7,17 +7,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.pixelpeppers.Route
 import com.example.pixelpeppers.coordinators.dataCoordinator.DataCoordinator
-import com.example.pixelpeppers.services.UserService
+import com.example.pixelpeppers.clients.UserClient
 import com.example.pixelpeppers.ui.components.PixelPeppersButton
+import com.example.pixelpeppers.viewModels.UserViewModel
 
 
 @Composable
 fun TempPage(
     modifier: Modifier = Modifier,
     navController: NavController,
+    userViewModel: UserViewModel = hiltViewModel()
 ) {
     if (DataCoordinator.instance.accessToken != null) {
         navController.navigate(Route.OnboardingIntro.route)
@@ -34,7 +37,7 @@ fun TempPage(
             "co1sfj", "co5vmg", "co5xex"
         )
         PixelPeppersButton(text = "Login with twitch", onClick = {
-            UserService.instance.startTwitchAuthActivity(context)
+            userViewModel.startTwitchAuthActivity(context)
         })
     }
 

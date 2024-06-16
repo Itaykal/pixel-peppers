@@ -1,21 +1,22 @@
 package com.example.pixelpeppers.repositories
 
 import com.example.pixelpeppers.models.Game
-import com.example.pixelpeppers.models.Genre
-import com.example.pixelpeppers.services.GamesService
+import com.example.pixelpeppers.offlineCaching.daos.GameDao
+import com.example.pixelpeppers.clients.GameClient
 import com.google.gson.Gson
-import com.google.gson.JsonParser
+import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
 
-class GameRepository private constructor() {
-    companion object {
-        val instance: GameRepository by lazy(LazyThreadSafetyMode.SYNCHRONIZED) { GameRepository() }
-    }
+class GameRepository(
+    private val gameDao: GameDao,
+    private val gson: Gson,
+    private val gameClient: GameClient,
+) {
 
     suspend fun searchGames(search: String = "", limit: Int = 8): List<Game> {
         try {
-            val response = GamesService.instance.searchGames(search, limit)
-            return Gson().fromJson(
+            val response = gameClient.searchGames(search, limit)
+            return gson.fromJson(
                 response.body?.charStream(), object : TypeToken<List<Game>>() {}.type
             )
         } catch (e: Exception) {
@@ -27,8 +28,8 @@ class GameRepository private constructor() {
 
     suspend fun getGame(gameId: Int): Game? {
         try {
-            val response = GamesService.instance.getGame(gameId)
-            val games: List<Game> = Gson().fromJson(
+            val response = gameClient.getGame(gameId)
+            val games: List<Game> = gson.fromJson(
                 response.body?.charStream(), object : TypeToken<List<Game>>() {}.type
             )
             return games[0]
@@ -41,9 +42,11 @@ class GameRepository private constructor() {
 
     suspend fun getCoverURL(gameId: Int): String {
         try {
-            val response = GamesService.instance.getCoverURL(gameId)
-            return JsonParser.parseReader(response.body?.charStream())
-                .asJsonArray[0].asJsonObject.get(
+            val response = gameClient.getCoverURL(gameId)
+            return gson.fromJson(
+                response.body?.charStream(),
+                JsonArray::class.java
+            )[0].asJsonObject.get(
                 "url"
             ).asString
         } catch (e: Exception) {

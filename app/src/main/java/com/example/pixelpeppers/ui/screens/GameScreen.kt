@@ -67,9 +67,9 @@ fun GamePage(
     ) {
         val game = remember { mutableStateOf<Game?>(null) }
         LaunchedEffect(Unit) {
-            GameRepository.instance.getGame(gameID).let {
-                game.value = it
-            }
+//            GameRepository.instance.getGame(gameID).let {
+//                game.value = it
+//            }
         }
         if (game.value == null) {
             LoadingAnimation()

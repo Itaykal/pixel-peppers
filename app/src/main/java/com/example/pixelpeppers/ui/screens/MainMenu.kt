@@ -45,15 +45,14 @@ fun MainMenu(
     val topics = listOf<String>("tmp", "tmp2", "tmp3")
 
     LaunchedEffect(Unit) {
-        println("MENUUUUUUU")
-        GameRepository.instance.getGame(17000).let {
-            trendingGame.value = it
-        }
-        for (topic in topics) {
-            GameRepository.instance.searchGames("stardew", limit = 20).let {
-                gamesMap[topic] = it
-            }
-        }
+//        GameRepository.instance.getGame(17000).let {
+//            trendingGame.value = it
+//        }
+//        for (topic in topics) {
+//            GameRepository.instance.searchGames("stardew", limit = 20).let {
+//                gamesMap[topic] = it
+//            }
+//        }
     }
     Box(
         contentAlignment = Alignment.Center,
