@@ -22,17 +22,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.pixelpeppers.R
 import com.example.pixelpeppers.Route
 import com.example.pixelpeppers.coordinators.dataCoordinator.DataCoordinator
-import com.example.pixelpeppers.services.UserService
-
+import com.example.pixelpeppers.viewModels.UserViewModel
 
 @Composable
 fun Login(
     modifier: Modifier = Modifier,
     navController: NavController,
+    userViewModel: UserViewModel = hiltViewModel()
 ) {
     if (DataCoordinator.instance.accessToken != null) {
         // @@ TODO: Remove navcontroller
@@ -62,8 +63,7 @@ fun Login(
                 shape = MaterialTheme.shapes.small,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF633ea6)),
                 onClick = {
-                    // @@ TODO: Use ViewModel
-                    UserService.instance.startTwitchAuthActivity(context)
+                    userViewModel.startTwitchAuthActivity(context)
                 },
             ) {
                 Icon(

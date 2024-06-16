@@ -16,12 +16,15 @@ class Converters {
     }
 
     @TypeConverter
-    fun listOfStringsToString(l: List<String>): String {
-        return l.joinToString(",")
+    fun listOfStringsToString(l: List<String>?): String {
+        return l?.joinToString(",") ?: ""
     }
 
     @TypeConverter
-    fun listOfStringsFromString(value: String): List<String> {
+    fun listOfStringsFromString(value: String): List<String>? {
+        if (value == "") {
+            return null
+        }
         return value.split(",")
     }
 

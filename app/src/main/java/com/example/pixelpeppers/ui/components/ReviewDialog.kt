@@ -1,7 +1,5 @@
 package com.example.pixelpeppers.ui.components
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,16 +25,13 @@ fun ReviewDialog(
     onSubmit: (title: String, description: String, rating: Int) -> Unit,
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit = {},
+    openGallery: () -> Unit = {},
+    uploadingImages: Boolean = false,
 ) {
     val rating = remember { mutableIntStateOf(1) } //default rating will be 1
     val isTitleValid = remember { mutableStateOf(false) }
     val title = remember { mutableStateOf("") }
     val review = remember { mutableStateOf("") }
-    val galleryLauncher =  rememberLauncherForActivityResult(GetContent()) { imageUri ->
-        imageUri?.let {
-            // @@ TODO: viewModel.addImageToStorage(imageUri)
-        }
-    }
 
     Dialog(onDismissRequest = onDismissRequest) {
         Box(
@@ -72,17 +67,22 @@ fun ReviewDialog(
                     modifier = Modifier
                         .padding(vertical = 10.dp)
                 )
-                Button(onClick = {
-                    galleryLauncher.launch("image/*")
-                }) {
+                Button(
+                    onClick = openGallery
+                ) {
                     Text(
                         text = "Add Images",
                     )
                 }
                 Row() {
                     Button(
-                        enabled = isTitleValid.value,
-                        onClick = { onSubmit(title.value, review.value, rating.intValue) }
+                        enabled = isTitleValid.value && uploadingImages,
+                        onClick = {
+                            onSubmit(title.value, review.value, rating.intValue)
+                            title.value = ""
+                            review.value = ""
+                            rating.intValue = 1
+                        }
                     ) {
                         Text(
                             text = "Submit"

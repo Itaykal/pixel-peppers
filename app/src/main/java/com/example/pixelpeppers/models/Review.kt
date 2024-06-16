@@ -6,12 +6,13 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "reviews")
 data class Review (
-    @PrimaryKey val id: String,
-    @ColumnInfo(name="rating") val rating: Int,
-    @ColumnInfo(name="title") val title: String,
+    @PrimaryKey val id: String = "",
+    @ColumnInfo(name="rating") val rating: Int = 1,
+    @ColumnInfo(name="title") val title: String = "",
     @ColumnInfo(name="description") val description: String? = null,
-    @ColumnInfo(name="game_id") val gameId: Int,
-    @ColumnInfo(name="author_id") val authorId: String,
-    @ColumnInfo(name="author_display_name") val authorDisplayName: String,
+    @ColumnInfo(name="game_id") val gameId: Int = 0,
+    @ColumnInfo(name="author_id") val authorId: String = "",
+    @ColumnInfo(name="author_display_name") val authorDisplayName: String = "",
     @ColumnInfo(name="image_ids") val imageIDs: List<String>? = null,
 )
+

@@ -1,5 +1,6 @@
 package com.example.pixelpeppers.viewModels
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -16,6 +17,14 @@ class ImageViewModel
 @Inject constructor(
     private val repository: ImageRepository,
 ) : ViewModel() {
+
+    fun createImage(imageUri: Uri): String{
+        var id = ""
+        viewModelScope.launch {
+            id = repository.createImage(imageUri)
+        }
+        return id
+    }
 
     fun refreshImages(review: Review) {
         if (!review.imageIDs.isNullOrEmpty()) {

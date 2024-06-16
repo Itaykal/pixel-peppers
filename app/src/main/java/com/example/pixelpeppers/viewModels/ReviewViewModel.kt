@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pixelpeppers.models.CreateReview
 import com.example.pixelpeppers.models.UpdateReview
+import com.example.pixelpeppers.repositories.ImageRepository
 import com.example.pixelpeppers.repositories.ReviewRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -13,6 +14,7 @@ import javax.inject.Inject
 class ReviewViewModel
 @Inject constructor(
     private val repository: ReviewRepository,
+    private val imageRepository: ImageRepository,
 ) : ViewModel() {
 
     fun refreshReviewsByGameId(gameId: Int) {
@@ -34,6 +36,7 @@ class ReviewViewModel
             repository.addReview(review)
         }
     }
+
 
     fun updateReview(reviewId: String, review: UpdateReview) {
         viewModelScope.launch {

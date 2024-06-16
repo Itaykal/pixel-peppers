@@ -185,7 +185,7 @@ fun ReviewBlock(
 
             ) {
                 Text(
-                    text = review.description!!,
+                    text = review.description ?: "",
                     color = MaterialTheme.colorScheme.onBackground,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = maxLines,

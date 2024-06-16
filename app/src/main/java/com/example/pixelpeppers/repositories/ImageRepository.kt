@@ -1,7 +1,7 @@
 package com.example.pixelpeppers.repositories
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
-import com.example.pixelpeppers.models.CreateImage
 import com.example.pixelpeppers.models.Image
 import com.example.pixelpeppers.offlineCaching.daos.ImageDao
 import com.google.firebase.Firebase
@@ -11,7 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import java.security.MessageDigest
+import java.util.UUID
 
 class ImageRepository(private val imageDao: ImageDao) {
     val storage = Firebase.storage
@@ -21,15 +21,13 @@ class ImageRepository(private val imageDao: ImageDao) {
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
     @OptIn(ExperimentalStdlibApi::class)
-    suspend fun createImage(image: CreateImage): String {
-        val md = MessageDigest.getInstance("MD5")
-        val digest = md.digest(image.bytes)
-        val id = digest.toHexString()
+    suspend fun createImage(imageUri: Uri): String {
+        val id = UUID.randomUUID().toString()
 
         val newImageRef = imageRef.child(id)
-
+        println("newImageRef: $newImageRef")
         coroutineScope.launch(Dispatchers.IO) {
-            newImageRef.putBytes(image.bytes).await()
+            newImageRef.putFile(imageUri).await()
         }
 
         return id
