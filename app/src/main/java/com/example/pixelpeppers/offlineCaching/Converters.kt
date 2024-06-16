@@ -2,7 +2,6 @@ package com.example.pixelpeppers.offlineCaching
 
 import androidx.room.TypeConverter
 import com.example.pixelpeppers.models.Genre
-import com.example.pixelpeppers.models.Image
 
 class Converters {
     @TypeConverter
@@ -26,12 +25,12 @@ class Converters {
 //    }
 
     @TypeConverter
-    fun listOfImagesToString(l: List<Image>): String {
-        return l.joinToString(",") { it.url }
+    fun listOfStringsToString(l: List<String>): String {
+        return l.joinToString(",")
     }
 
     @TypeConverter
-    fun listOfImagesFromString(value: String): List<Image> {
-        return value.split(",").map { Image(it) }
+    fun listOfStringsFromString(value: String): List<String> {
+        return value.split(",")
     }
 }

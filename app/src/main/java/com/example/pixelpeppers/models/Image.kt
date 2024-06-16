@@ -6,6 +6,6 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "images")
 data class Image (
-    @PrimaryKey val url: String,
+    @PrimaryKey val id: String,
     @ColumnInfo(name = "bytes") val bytes: ByteArray? = null
 )

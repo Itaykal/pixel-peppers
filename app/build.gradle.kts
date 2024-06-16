@@ -50,6 +50,7 @@ android {
 }
 
 dependencies {
+    implementation("com.google.firebase:firebase-storage")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation("com.google.dagger:hilt-android:2.48")
     kapt("com.google.dagger:hilt-android-compiler:2.48")

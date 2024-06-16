@@ -35,7 +35,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.pixelpeppers.R
 import com.example.pixelpeppers.models.Game
-import com.example.pixelpeppers.models.Image
 import com.example.pixelpeppers.models.ImageSize
 import com.example.pixelpeppers.models.Review
 import com.example.pixelpeppers.repositories.GameRepository
@@ -144,13 +143,9 @@ fun GamePage(
                         authorId = "1",
                         authorDisplayName = "torrell8",
                         gameId = 17000,
-                        mediaURLs = listOf(
-                            Image("https://images.unsplash.com/photo-1551963831-b3b1ca40c98e"),
-                            Image("https://images.unsplash.com/photo-1551782450-a2132b4ba21d"),
-                            Image("https://images.unsplash.com/photo-1551782450-a2132b4ba21d"),
-                            Image("https://images.unsplash.com/photo-1551782450-a2132b4ba21d"),
-                            Image("https://images.unsplash.com/photo-1551782450-a2132b4ba21d"),
-                            Image("https://images.unsplash.com/photo-1551782450-a2132b4ba21d"),
+                        imageIDs = listOf(
+                            "baba.jpg",
+                            "bn.jpg"
                         )
                     ))
 
