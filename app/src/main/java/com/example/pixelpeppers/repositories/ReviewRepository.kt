@@ -12,6 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.time.Instant
 
 class ReviewRepository(private val reviewDao: ReviewDao) {
 
@@ -36,6 +37,7 @@ class ReviewRepository(private val reviewDao: ReviewDao) {
             authorId = currentUser.uid,
             authorDisplayName = currentUser.displayName!!,
             imageIDs = createReview.imageIDs,
+            createdAt = Instant.now().toEpochMilli(),
         )
         doc.set(review).await()
         println("Review added: $review")

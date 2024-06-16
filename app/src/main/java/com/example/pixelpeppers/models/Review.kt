@@ -14,5 +14,6 @@ data class Review (
     @ColumnInfo(name="author_id") val authorId: String = "",
     @ColumnInfo(name="author_display_name") val authorDisplayName: String = "",
     @ColumnInfo(name="image_ids") val imageIDs: List<String>? = null,
+    @ColumnInfo(name="created_at") val createdAt: Long = 0,
 )
 
