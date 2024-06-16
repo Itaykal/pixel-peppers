@@ -12,6 +12,9 @@ interface ReviewDao {
     @Query("SELECT * FROM reviews WHERE game_id = :gameId ORDER BY created_at DESC")
     fun getReviewsByGame(gameId: Int): LiveData<List<Review>>
 
+    @Query("SELECT * FROM reviews WHERE author_id = :userId ORDER BY created_at DESC")
+    fun getReviewsByUserID(userId: String): LiveData<List<Review>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(reviews: List<Review>)
 
