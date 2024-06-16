@@ -17,7 +17,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -26,7 +25,6 @@ import com.example.pixelpeppers.models.Game
 import com.example.pixelpeppers.ui.components.GamePreview
 import com.example.pixelpeppers.ui.components.PixelPeppersSearchBar
 import com.example.pixelpeppers.viewModels.GameViewModel
-import kotlinx.coroutines.launch
 
 
 @Composable
@@ -60,15 +58,15 @@ fun Search(
             } else {
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3),
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalArrangement = Arrangement.spacedBy(42.dp),
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     state = searchState
                 ) {
                     items(games!!) {
                         GamePreview(
                             game = it,
-                            modifier = modifier,
-                            onClick = { onGameClick(it) }
+                            onClick = { onGameClick(it) },
+                            modifier = modifier
                         )
                     }
                 }
