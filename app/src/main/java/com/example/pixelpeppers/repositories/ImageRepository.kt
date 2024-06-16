@@ -20,7 +20,6 @@ class ImageRepository(private val imageDao: ImageDao) {
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
-    @OptIn(ExperimentalStdlibApi::class)
     suspend fun createImage(imageUri: Uri): String {
         val id = UUID.randomUUID().toString()
 
@@ -29,7 +28,7 @@ class ImageRepository(private val imageDao: ImageDao) {
         coroutineScope.launch(Dispatchers.IO) {
             newImageRef.putFile(imageUri).await()
         }
-
+        refreshImage(id)
         return id
     }
 
