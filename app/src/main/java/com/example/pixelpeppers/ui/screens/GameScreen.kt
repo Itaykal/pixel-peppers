@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -24,15 +25,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.pixelpeppers.models.Game
 import com.example.pixelpeppers.models.ImageSize
 import com.example.pixelpeppers.repositories.GameRepository
 import com.example.pixelpeppers.ui.components.GamePreview
+import com.example.pixelpeppers.viewModels.GameViewModel
 
 @Composable
 fun GamePage(
     modifier: Modifier = Modifier,
     gameID: Int = 17000,
+    gameViewModel: GameViewModel = hiltViewModel()
 ) {
     val lazyListState = rememberLazyListState()
     val firstItemTranslationY by remember {
@@ -58,23 +62,20 @@ fun GamePage(
         }
     }
 
-
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        val game = remember { mutableStateOf<Game?>(null) }
+        val game by gameViewModel.getGameById(gameID).observeAsState()
         LaunchedEffect(Unit) {
-//            GameRepository.instance.getGame(gameID).let {
-//                game.value = it
-//            }
+            gameViewModel.refreshGamesByID(gameID)
         }
-        if (game.value == null) {
+        if (game == null) {
             LoadingAnimation()
         } else {
-            val gameRes = game.value!!
+            val gameRes = game!!
             Box (
                 modifier = modifier
                     .fillMaxSize()
@@ -116,7 +117,8 @@ fun GamePage(
                                 .background(MaterialTheme.colorScheme.background)
                         )
                         Spacer(
-                            modifier = Modifier.height(10.dp)
+                            modifier = Modifier
+                                .height(10.dp)
                                 .fillMaxWidth()
                                 .background(MaterialTheme.colorScheme.background)
                         )

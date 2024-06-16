@@ -16,8 +16,6 @@ import kotlinx.coroutines.tasks.await
 
 class ReviewRepository(private val reviewDao: ReviewDao) {
 
-    val allReviews = reviewDao.getAllReviews()
-
     private val auth = Firebase.auth
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
@@ -69,14 +67,10 @@ class ReviewRepository(private val reviewDao: ReviewDao) {
     }
 
     fun getReviewsByGameId(gameId: Int): LiveData<List<Review>> {
-        return MediatorLiveData<List<Review>>().apply {
-            addSource(allReviews) {
-                this.value = it.filter { review -> review.gameId == gameId }
-            }
-        }
+        return reviewDao.getReviewsByGame(gameId)
     }
 
-    suspend fun refreshReviewsByGameId(gameId: Int): LiveData<List<Review>> {
+    suspend fun refreshReviewsByGameId(gameId: Int) {
         try {
             val reviews = collection
                 .whereEqualTo("gameId", gameId)
@@ -89,7 +83,6 @@ class ReviewRepository(private val reviewDao: ReviewDao) {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        return reviewDao.getReviewsByGame(gameId)
     }
 
 

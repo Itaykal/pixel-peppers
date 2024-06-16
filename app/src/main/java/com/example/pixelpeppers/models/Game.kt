@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
-@Entity
+@Entity(tableName = "games")
 data class Game(
     @PrimaryKey @SerializedName("id") val id: Int,
     @ColumnInfo(name = "name") @SerializedName("name") val name: String,

@@ -32,18 +32,18 @@ class GameClient(
             okHttpClient.newCall(request).await()
         }
 
-    suspend fun getGame(gameId: Int): Response = withContext(Dispatchers.IO) {
-        val query =
-            "where id=$gameId; fields name,id,genres.name,genres.id,cover.url,summary,similar_games;"
+    suspend fun getGamesByGenre(genre: String, limit: Int =8): Response = withContext(Dispatchers.IO) {
+        val query = "where genre.name=\"$genre\"; limit $limit; fields name,id,genres.name,genres.id,cover.url;"
         val body = query.toRequestBody(PLAIN)
         val request = Request.Builder().url("$BASE_URL/games").post(body).build()
         okHttpClient.newCall(request).await()
     }
 
-    suspend fun getCoverURL(gameId: Int): Response = withContext(Dispatchers.IO) {
-        val query = "where game=$gameId; fields url;"
+    suspend fun getGame(gameId: Int): Response = withContext(Dispatchers.IO) {
+        val query =
+            "where id=$gameId; fields name,id,genres.name,genres.id,cover.url,summary,similar_games;"
         val body = query.toRequestBody(PLAIN)
-        val request = Request.Builder().url("$BASE_URL/covers").post(body).build()
+        val request = Request.Builder().url("$BASE_URL/games").post(body).build()
         okHttpClient.newCall(request).await()
     }
 }

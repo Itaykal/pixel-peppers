@@ -21,8 +21,8 @@ class Converters {
     }
 
     @TypeConverter
-    fun genreListToString(genres: List<Genre>): String {
-        return genres.joinToString(",") { it.name }
+    fun genreListToString(genres: List<Genre>?): String {
+        return genres?.joinToString(",") { it.name } ?: ""
     }
 
     @TypeConverter
@@ -31,7 +31,7 @@ class Converters {
     }
 
     @TypeConverter
-    fun coverToString(cover: Cover): String {
-        return cover.url
+    fun coverToString(cover: Cover?): String {
+        return cover?.url ?: ""
     }
 }
