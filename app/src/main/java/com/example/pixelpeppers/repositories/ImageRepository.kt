@@ -14,9 +14,9 @@ import kotlinx.coroutines.tasks.await
 import java.util.UUID
 
 class ImageRepository(private val imageDao: ImageDao) {
-    val storage = Firebase.storage
-    val storageRef = storage.reference
-    var imageRef: StorageReference = storageRef.child("images")
+    private val storage = Firebase.storage
+    private val storageRef = storage.reference
+    private var imageRef: StorageReference = storageRef.child("images")
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
@@ -24,7 +24,6 @@ class ImageRepository(private val imageDao: ImageDao) {
         val id = UUID.randomUUID().toString()
 
         val newImageRef = imageRef.child(id)
-        println("newImageRef: $newImageRef")
         coroutineScope.launch(Dispatchers.IO) {
             newImageRef.putFile(imageUri).await()
         }

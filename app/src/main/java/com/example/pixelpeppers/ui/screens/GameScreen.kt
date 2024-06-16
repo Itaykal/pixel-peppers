@@ -213,7 +213,6 @@ fun GamePage(
                     }
 
                     itemsIndexed(reviews!!) { index, review ->
-                        // @@ TODO: Implement comment fetching
                         ReviewBlock(review = review)
                         Spacer(
                             modifier = Modifier

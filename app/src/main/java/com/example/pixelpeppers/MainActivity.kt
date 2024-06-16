@@ -15,6 +15,7 @@ import com.example.pixelpeppers.viewModels.UserViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity(
@@ -25,14 +26,16 @@ class MainActivity : ComponentActivity(
         var route: Route = Route.Login
         val currentUser = Firebase.auth.currentUser
         if (currentUser != null) {
-            userViewModel.refreshUser()
+            userViewModel.refreshUser(Firebase.auth.currentUser!!.uid)
             route = Route.Menu
         } else {
             val uri: Uri? = intent.data
             if (uri != null && uri.path.equals("/auth")) {
                 val code = uri.getQueryParameter("code")
                 if (code != null) {
-                    userViewModel.loginWithCode(code)
+                    runBlocking {
+                        userViewModel.loginWithCode(code)
+                    }
                     route = Route.OnboardingIntro
                 }
             }

@@ -18,10 +18,8 @@ class UserViewModel @Inject constructor(private val userRepository: UserReposito
         userRepository.startTwitchAuthActivity(context)
     }
 
-    fun loginWithCode(code: String) {
-        viewModelScope.launch {
-            userRepository.loginWithCode(code)
-        }
+    suspend fun loginWithCode(code: String) {
+        userRepository.loginWithCode(code)
     }
 
     fun getUser(id: String? = null): LiveData<User> {
