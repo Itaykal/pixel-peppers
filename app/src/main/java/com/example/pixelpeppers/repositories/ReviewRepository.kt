@@ -1,7 +1,6 @@
 package com.example.pixelpeppers.repositories
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import com.example.pixelpeppers.models.CreateReview
 import com.example.pixelpeppers.models.Review
 import com.example.pixelpeppers.models.UpdateReview
@@ -13,6 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.time.Instant
 
 class ReviewRepository(private val reviewDao: ReviewDao) {
 
@@ -36,9 +36,14 @@ class ReviewRepository(private val reviewDao: ReviewDao) {
             title = createReview.title,
             authorId = currentUser.uid,
             authorDisplayName = currentUser.displayName!!,
+            imageIDs = createReview.imageIDs,
+            createdAt = Instant.now().toEpochMilli(),
         )
         doc.set(review).await()
-        reviewDao.insertAll(listOf(review))
+        println("Review added: $review")
+        coroutineScope.launch(Dispatchers.IO) {
+            reviewDao.insertAll(listOf(review))
+        }
     }
 
     suspend fun deleteReview(reviewId: String) {
@@ -46,7 +51,9 @@ class ReviewRepository(private val reviewDao: ReviewDao) {
             .document(reviewId)
             .delete()
             .await()
-        reviewDao.deleteReview(reviewId)
+        coroutineScope.launch(Dispatchers.IO) {
+            reviewDao.deleteReview(reviewId)
+        }
     }
 
     suspend fun updateReview(reviewId: String, updateReview: UpdateReview) {
@@ -58,12 +65,14 @@ class ReviewRepository(private val reviewDao: ReviewDao) {
                 "title", updateReview.title
             )
             .await()
-        reviewDao.updateReview(
-            reviewId,
-            updateReview.rating,
-            updateReview.title,
-            updateReview.description,
-        )
+        coroutineScope.launch(Dispatchers.IO) {
+            reviewDao.updateReview(
+                reviewId,
+                updateReview.rating,
+                updateReview.title,
+                updateReview.description,
+            )
+        }
     }
 
     fun getReviewsByGameId(gameId: Int): LiveData<List<Review>> {

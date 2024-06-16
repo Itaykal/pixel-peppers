@@ -10,7 +10,7 @@ import com.example.pixelpeppers.ui.screens.GamePage
 import com.example.pixelpeppers.ui.screens.MainMenu
 import com.example.pixelpeppers.ui.screens.Onboarding
 import com.example.pixelpeppers.ui.screens.Search
-import com.example.pixelpeppers.ui.screens.TempPage
+import com.example.pixelpeppers.ui.screens.Login
 
 @Composable
 fun NavGraph(
@@ -43,7 +43,7 @@ fun NavGraph(
         composable(
             route = Route.Login.route
         ) {
-            TempPage(navController = navController)
+            Login(navController = navController)
         }
         composable(
             route = Route.Search.route

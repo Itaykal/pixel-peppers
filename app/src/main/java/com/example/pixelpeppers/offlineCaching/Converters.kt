@@ -16,6 +16,19 @@ class Converters {
     }
 
     @TypeConverter
+    fun listOfStringsToString(l: List<String>?): String {
+        return l?.joinToString(",") ?: ""
+    }
+
+    @TypeConverter
+    fun listOfStringsFromString(value: String): List<String>? {
+        if (value == "") {
+            return null
+        }
+        return value.split(",")
+    }
+
+    @TypeConverter
     fun genreListFromString(value: String): List<Genre> {
         return value.split(",").map { Genre(it) }
     }

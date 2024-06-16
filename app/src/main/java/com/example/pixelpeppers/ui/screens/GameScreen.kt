@@ -1,16 +1,25 @@
 package com.example.pixelpeppers.ui.screens
 
 import LoadingAnimation
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,28 +31,48 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.pixelpeppers.models.Game
+import com.example.pixelpeppers.R
+import com.example.pixelpeppers.models.CreateReview
 import com.example.pixelpeppers.models.ImageSize
-import com.example.pixelpeppers.repositories.GameRepository
 import com.example.pixelpeppers.ui.components.GamePreview
+import com.example.pixelpeppers.ui.components.GenreTag
+import com.example.pixelpeppers.ui.components.ReviewBlock
+import com.example.pixelpeppers.ui.components.ReviewDialog
 import com.example.pixelpeppers.viewModels.GameViewModel
+import com.example.pixelpeppers.viewModels.ImageViewModel
+import com.example.pixelpeppers.viewModels.ReviewViewModel
 
 @Composable
 fun GamePage(
     modifier: Modifier = Modifier,
     gameID: Int = 17000,
-    gameViewModel: GameViewModel = hiltViewModel()
+    gameViewModel: GameViewModel = hiltViewModel(),
+    reviewViewModel: ReviewViewModel = hiltViewModel(),
+    imageViewModel: ImageViewModel = hiltViewModel(),
 ) {
+    val showReviewDialog = remember { mutableStateOf(false) }
     val lazyListState = rememberLazyListState()
+    val uploadingFinished = remember { mutableStateOf(true) }
+    val imageIDs = remember { mutableListOf<String>() }
+    val galleryLauncher =  rememberLauncherForActivityResult(GetContent()) { imageUri ->
+        imageUri?.let {
+            imageIDs.add(imageViewModel.createImage(imageUri))
+            uploadingFinished.value = true
+        }
+    }
     val firstItemTranslationY by remember {
         derivedStateOf {
             when {
                 lazyListState.layoutInfo.visibleItemsInfo.isNotEmpty()
                         && lazyListState.firstVisibleItemIndex == 0 -> lazyListState.firstVisibleItemScrollOffset * 0.9f
+
                 else -> 0f
             }
         }
@@ -57,7 +86,8 @@ fun GamePage(
 
                     scrollOffset / imageSize.toFloat()
                 }
-                else                                                                                               -> 1f
+
+                else -> 1f
             }
         }
     }
@@ -69,19 +99,50 @@ fun GamePage(
             .background(MaterialTheme.colorScheme.background)
     ) {
         val game by gameViewModel.getGameById(gameID).observeAsState()
+        val reviews by reviewViewModel.getReviewsByGameId(gameID).observeAsState()
+
         LaunchedEffect(Unit) {
             gameViewModel.refreshGamesByID(gameID)
+            reviewViewModel.refreshReviewsByGameId(gameID)
         }
-        if (game == null) {
+        if (game == null || reviews == null) {
             LoadingAnimation()
         } else {
             val gameRes = game!!
-            Box (
+
+            if (showReviewDialog.value) {
+                ReviewDialog(
+                    openGallery ={
+                        galleryLauncher.launch("image/*")
+                        uploadingFinished.value = false
+                    },
+                    uploadingImages = uploadingFinished.value,
+                    onSubmit = { title, description, rating ->
+                        reviewViewModel.addReview(
+                            CreateReview(
+                                gameId = gameRes.id,
+                                rating = rating,
+                                title = title,
+                                description = description,
+                                imageIDs = imageIDs
+                            )
+                        )
+                        showReviewDialog.value = false
+                        uploadingFinished.value = true
+                    },
+                    onDismissRequest = {
+                        showReviewDialog.value = false
+                        uploadingFinished.value = false
+                    }
+                )
+            }
+
+            Box(
                 modifier = modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
             ) {
-                LazyColumn (
+                LazyColumn(
                     state = lazyListState,
                     verticalArrangement = Arrangement.spacedBy(0.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -107,15 +168,8 @@ fun GamePage(
                                 }
                         )
                     }
-                    items(66) {index ->
-                        // @@ TODO: Implement comment fetching and component.
-                        Text(
-                            text = index.toString(),
-                            color = MaterialTheme.colorScheme.onBackground,
-                            modifier = modifier
-                                .fillMaxWidth()
-                                .background(MaterialTheme.colorScheme.background)
-                        )
+
+                    item {
                         Spacer(
                             modifier = Modifier
                                 .height(10.dp)
@@ -123,8 +177,80 @@ fun GamePage(
                                 .background(MaterialTheme.colorScheme.background)
                         )
                     }
+                    item {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(5.dp),
+                            modifier = Modifier
+                                .background(MaterialTheme.colorScheme.background)
+                                .fillMaxWidth()
+                        ) {
+                            Text(
+                                text = gameRes.name,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.ExtraBold,
+                                maxLines = 1,
+                                modifier = Modifier
+                                    .padding(start = 10.dp)
+                            )
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                                modifier = Modifier
+                                    .padding(start = 10.dp, bottom = 10.dp)
+                            ) {
+                                repeat(3) { index ->
+                                    if (index < gameRes.genres.size) {
+                                        GenreTag(
+                                            text = gameRes.genres[index].name,
+                                            clickable = false,
+                                            modifier = Modifier
+                                                .height(30.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    itemsIndexed(reviews!!) { index, review ->
+                        // @@ TODO: Implement comment fetching
+                        ReviewBlock(review = review)
+                        Spacer(
+                            modifier = Modifier
+                                .height(10.dp)
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.background)
+                        )
+                        if (index == reviews!!.size - 1) {
+                            Spacer(
+                                modifier = Modifier
+                                    .height(100.dp)
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colorScheme.background)
+                            )
+                        }
+                    }
+                }
+                FloatingActionButton(
+                    onClick = {
+                        showReviewDialog.value = true
+                    },
+                    shape = CircleShape,
+                    modifier = Modifier
+                        .padding(bottom = 40.dp, end = 10.dp)
+                        .align(Alignment.BottomEnd)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.plus),
+                        contentDescription = "Add Comment",
+                        tint = Color.White,
+                        modifier = Modifier
+                            .size(60.dp)
+                            .padding(10.dp)
+                    )
                 }
             }
         }
     }
 }
+
