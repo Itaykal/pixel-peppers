@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.pixelpeppers.offlineCaching.PixelPeppersDatabase
 import com.example.pixelpeppers.offlineCaching.daos.GenreDao
+import com.example.pixelpeppers.offlineCaching.daos.ReviewDao
 import com.example.pixelpeppers.offlineCaching.daos.UserDao
 import dagger.Module
 import dagger.Provides
@@ -24,6 +25,11 @@ object DatabaseModule {
     @Provides
     fun provideUserDao(appDatabase: PixelPeppersDatabase): UserDao {
         return appDatabase.userDao()
+    }
+
+    @Provides
+    fun provideReviewDao(appDatabase: PixelPeppersDatabase): ReviewDao {
+        return appDatabase.reviewDao()
     }
 
     @Provides
