@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -51,6 +52,7 @@ import com.example.pixelpeppers.viewModels.UserViewModel
 fun ReviewBlock(
     review: Review,
     modifier: Modifier = Modifier,
+    onFinishLoading: () -> Unit = {},
     imageViewModel: ImageViewModel = hiltViewModel(),
     userViewModel: UserViewModel = hiltViewModel(),
 ) {
@@ -64,22 +66,16 @@ fun ReviewBlock(
 
 
     LaunchedEffect(Unit) {
-        imageViewModel.refreshImages(review)
+        imageViewModel.refreshReviewImages(review)
         userViewModel.refreshUser(review.authorId)
     }
     LaunchedEffect(author) {
-        if (author != null) {
-            println("Refreshing Image")
-            imageViewModel.refreshImage(author!!.profileImageUrl)
-        }
+        author?.let { imageViewModel.refreshImage(it.profileImageUrl) }
     }
-    if (author == null || authorImage == null) {
-        LoadingAnimation(
-            modifier = modifier.padding(
-                horizontal = 10.dp
-            )
-        )
-    } else {
+    if (author != null && authorImage != null)  {
+        LaunchedEffect(Unit) {
+            onFinishLoading()
+        }
         Row(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.Top,

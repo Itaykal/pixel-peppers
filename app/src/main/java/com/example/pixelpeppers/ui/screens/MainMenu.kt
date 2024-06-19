@@ -112,8 +112,8 @@ fun MainMenu(
                     }
                 }
 
-                items(gamesMap.keys.toList()) { key ->
-                    val games by gamesMap[key]!!.observeAsState()
+                items(gamesMap.toList()) { (key, value) ->
+                    val games by value.observeAsState()
                     if (games.isNullOrEmpty()) {
                         LoadingAnimation()
                     } else {
