@@ -1,9 +1,6 @@
 package com.example.pixelpeppers.repositories
 
 import android.net.Uri
-import androidx.lifecycle.LiveData
-import com.example.pixelpeppers.models.Image
-import com.example.pixelpeppers.offlineCaching.daos.ImageDao
 import com.google.firebase.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.storage
@@ -13,7 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
 
-class ImageRepository(private val imageDao: ImageDao) {
+class ImageRepository() {
     private val storage = Firebase.storage
     private val storageRef = storage.reference
     private var imageRef: StorageReference = storageRef.child("images")
@@ -26,32 +23,16 @@ class ImageRepository(private val imageDao: ImageDao) {
         val newImageRef = imageRef.child(id)
         coroutineScope.launch(Dispatchers.IO) {
             newImageRef.putFile(imageUri).await()
-            refreshImage(id)
         }
         return id
     }
 
-    suspend fun refreshImage(id: String) {
-        val HUNDRED_MEGABYTES: Long = 100 * 1024 * 1024
-
-        val targetImageRef = imageRef.child(id)
-
-        coroutineScope.launch(Dispatchers.IO) {
-            try {
-                val bytes = targetImageRef.getBytes(HUNDRED_MEGABYTES).await()
-                val image = Image(id, bytes)
-                imageDao.insertImage(image)
-            } catch (_: java.lang.Exception) {
-            } catch (_: Exception) {}
-        }
+    fun getImage(id: String): StorageReference {
+        println("NODER NODER NODER NODER")
+        return imageRef.child(id)
     }
 
-    suspend fun refreshImages(ids: List<String>) {
-        for (id in ids) {
-            refreshImage(id)
-        }
+    fun getImagesByIds(ids: List<String>): List<StorageReference> {
+        return ids.map{ getImage(it) }
     }
-
-    fun getImage(id: String): LiveData<Image> = imageDao.getImageById(id)
-    fun getImagesByIds(ids: List<String>): LiveData<List<Image>> = imageDao.getImagesByIds(ids)
 }

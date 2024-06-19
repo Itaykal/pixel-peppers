@@ -1,11 +1,8 @@
 package com.example.pixelpeppers.ui.components
 
-import LoadingAnimation
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,9 +21,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -34,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asComposeColorFilter
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.style.TextOverflow
@@ -42,10 +38,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.example.pixelpeppers.models.Image
+import com.bumptech.glide.integration.compose.GlideImage
 import com.example.pixelpeppers.models.Review
+import com.example.pixelpeppers.viewModels.GameViewModel
 import com.example.pixelpeppers.viewModels.ImageViewModel
 import com.example.pixelpeppers.viewModels.UserViewModel
+import com.google.firebase.storage.StorageReference
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -53,29 +51,37 @@ fun ReviewBlock(
     review: Review,
     modifier: Modifier = Modifier,
     onFinishLoading: () -> Unit = {},
+    addGameName: Boolean = false,
     imageViewModel: ImageViewModel = hiltViewModel(),
     userViewModel: UserViewModel = hiltViewModel(),
+    gameViewModel: GameViewModel = hiltViewModel(),
 ) {
     val author by userViewModel.getUser(review.authorId).observeAsState()
-    val imageList by imageViewModel.getReviewImages(review).observeAsState()
-    val authorImage by imageViewModel.getImage(author?.profileImageUrl).observeAsState()
+    val game by gameViewModel.getGameById(review.gameId).observeAsState()
     val minimumLineLength = 4
     val expandedState = remember { mutableStateOf(false) }
     val showReadMoreButtonState = remember { mutableStateOf(false) }
     val maxLines = if (expandedState.value) 200 else minimumLineLength
 
+    val imageList = remember { mutableStateListOf<StorageReference>() }
+    var authorImage = remember { mutableStateOf<StorageReference?>(null) }
+
 
     LaunchedEffect(Unit) {
-        imageViewModel.refreshReviewImages(review)
         userViewModel.refreshUser(review.authorId)
+        gameViewModel.refreshGamesByID(review.gameId)
+        imageList.addAll(imageViewModel.getReviewImages(review))
     }
+
     LaunchedEffect(author) {
-        author?.let { imageViewModel.refreshImage(it.profileImageUrl) }
+        author?.let { authorImage.value = imageViewModel.getImage(author!!.profileImageUrl) }
     }
-    if (author != null && authorImage != null)  {
+    if (author != null && authorImage.value != null && game != null) {
+
         LaunchedEffect(Unit) {
             onFinishLoading()
         }
+
         Row(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.Top,
@@ -84,10 +90,8 @@ fun ReviewBlock(
             Box(
                 modifier = Modifier.clip(CircleShape)
             ) {
-                Image(
-                    bitmap = BitmapFactory.decodeByteArray(
-                        authorImage!!.bytes, 0, authorImage!!.bytes!!.size
-                    ).asImageBitmap(),
+                GlideImage(
+                    model = authorImage.value,
                     contentDescription = author!!.displayName,
                     modifier = Modifier.size(35.dp)
                 )
@@ -114,6 +118,9 @@ fun ReviewBlock(
                 }
                 Row {
                     var reviewTitle = review.title
+                    if (addGameName) {
+                        reviewTitle = game!!.name + " - " + reviewTitle
+                    }
                     if (reviewTitle.length > 40) {
                         reviewTitle = reviewTitle.substring(0, 40) + "..."
                     }
@@ -126,58 +133,53 @@ fun ReviewBlock(
                 }
                 // Pictures
                 if (review.imageIDs != null) {
-                    if (!imageList.isNullOrEmpty()) {
-                        val mediaListState = rememberLazyListState()
-                        val showImageDialog = remember { mutableStateOf(false) }
-                        val zoomedImage = remember { mutableStateOf<Image?>(null) }
+                    val mediaListState = rememberLazyListState()
+                    val showImageDialog = remember { mutableStateOf(false) }
+                    val zoomedImage = remember { mutableStateOf<StorageReference?>(null) }
 
-                        LazyRow(
-                            state = mediaListState,
-                            horizontalArrangement = Arrangement.spacedBy(10.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 10.dp, bottom = 10.dp),
-                        ) {
-                            items(imageList!!) { image ->
-                                Image(bitmap = BitmapFactory.decodeByteArray(
-                                    image.bytes, 0, image.bytes!!.size
-                                ).asImageBitmap(),
-                                    contentDescription = "",
-                                    contentScale = ContentScale.Crop,
-                                    colorFilter = PorterDuffColorFilter(
-                                        Color.GRAY, PorterDuff.Mode.MULTIPLY
-                                    ).asComposeColorFilter(),
-                                    modifier = Modifier
-                                        .size(100.dp)
-                                        .clip(MaterialTheme.shapes.large)
-                                        .clickable {
-                                            showImageDialog.value = true
-                                            zoomedImage.value = image
-                                        })
-                            }
-                        }
-
-                        if (showImageDialog.value) {
-                            Dialog(onDismissRequest = {
-                                showImageDialog.value = false
-                                zoomedImage.value = null
-                            }) {
-                                Image(
-                                    bitmap = BitmapFactory.decodeByteArray(
-                                        zoomedImage.value!!.bytes,
-                                        0,
-                                        zoomedImage.value!!.bytes!!.size
-                                    ).asImageBitmap(),
-                                    contentDescription = "",
-                                    modifier = Modifier
-                                        .size(300.dp)
-                                        .clip(MaterialTheme.shapes.large)
-                                )
-                            }
-
+                    LazyRow(
+                        state = mediaListState,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 10.dp, bottom = 10.dp),
+                    ) {
+                        items(imageList) { image ->
+                            GlideImage(
+                                model = image,
+                                contentDescription = "",
+                                contentScale = ContentScale.Crop,
+                                colorFilter = PorterDuffColorFilter(
+                                    Color.GRAY, PorterDuff.Mode.MULTIPLY
+                                ).asComposeColorFilter(),
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .clip(MaterialTheme.shapes.large)
+                                    .clickable {
+                                        showImageDialog.value = true
+                                        zoomedImage.value = image
+                                    }
+                            )
                         }
                     }
+
+                    if (showImageDialog.value) {
+                        Dialog(onDismissRequest = {
+                            showImageDialog.value = false
+                            zoomedImage.value = null
+                        }) {
+                            GlideImage(
+                               model = zoomedImage.value,
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .size(300.dp)
+                                    .clip(MaterialTheme.shapes.large)
+                            )
+                        }
+
+                    }
+
                 }
 
                 // Review Content with read more option

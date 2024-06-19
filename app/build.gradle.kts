@@ -82,8 +82,11 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
+    implementation("com.firebaseui:firebase-ui-storage:8.0.2")
+
     implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
     val roomVersion = "2.6.1"
+    kapt("com.github.bumptech.glide:compiler:5.0.0-rc01")
 
     implementation("androidx.room:room-runtime:$roomVersion")
     annotationProcessor("androidx.room:room-compiler:$roomVersion")

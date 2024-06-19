@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
@@ -40,8 +39,8 @@ import com.example.pixelpeppers.R
 import com.example.pixelpeppers.models.ImageSize
 import com.example.pixelpeppers.ui.components.GamePreview
 import com.example.pixelpeppers.ui.components.GenreTag
-import com.example.pixelpeppers.ui.components.ReviewBlock
 import com.example.pixelpeppers.ui.components.ReviewDialog
+import com.example.pixelpeppers.ui.components.reviewList
 import com.example.pixelpeppers.viewModels.GameViewModel
 import com.example.pixelpeppers.viewModels.ReviewViewModel
 
@@ -181,30 +180,7 @@ fun GamePage(
                             }
                         }
                     }
-                    val loading: Array<Boolean> = reviews!!.map { true }.toTypedArray()
-
-                    itemsIndexed(reviews!!) { index, review ->
-                        ReviewBlock(review = review, onFinishLoading = { loading[index] = false })
-                        Spacer(
-                            modifier = Modifier
-                                .height(10.dp)
-                                .fillMaxWidth()
-                                .background(MaterialTheme.colorScheme.background)
-                        )
-                        if (index == reviews!!.size - 1) {
-                            Spacer(
-                                modifier = Modifier
-                                    .height(100.dp)
-                                    .fillMaxWidth()
-                                    .background(MaterialTheme.colorScheme.background)
-                            )
-                        }
-                    }
-                    if (loading.any { it }) {
-                        item {
-                            LoadingAnimation()
-                        }
-                    }
+                    reviewList(reviews)
                 }
                 FloatingActionButton(
                     onClick = {

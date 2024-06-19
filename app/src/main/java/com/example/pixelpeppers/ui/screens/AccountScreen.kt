@@ -1,11 +1,8 @@
 package com.example.pixelpeppers.ui.screens
 
 import LoadingAnimation
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,12 +11,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Button
@@ -36,30 +31,30 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.pixelpeppers.ui.components.ReviewBlock
-import com.example.pixelpeppers.viewModels.GameViewModel
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.example.pixelpeppers.ui.components.reviewList
 import com.example.pixelpeppers.viewModels.ImageViewModel
 import com.example.pixelpeppers.viewModels.ReviewViewModel
 import com.example.pixelpeppers.viewModels.UserViewModel
+import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.runBlocking
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun AccountScreen(
     userViewModel: UserViewModel = hiltViewModel(),
     reviewViewModel: ReviewViewModel = hiltViewModel(),
     imageViewModel: ImageViewModel = hiltViewModel(),
-    gameViewModel: GameViewModel = hiltViewModel(),
 ) {
+    var userImage = remember { mutableStateOf<StorageReference?>(null) }
     val currentUser by userViewModel.getUser().observeAsState()
     val reviews by reviewViewModel.getReviewsByUserId(currentUser?.id).observeAsState()
-    val userImage by imageViewModel.getImage(currentUser?.profileImageUrl).observeAsState()
-
     val editDisplayNameDialog = remember { mutableStateOf(false) }
 
     val galleryLauncher =  rememberLauncherForActivityResult(GetContent()) { imageUri ->
@@ -79,7 +74,7 @@ fun AccountScreen(
     LaunchedEffect(currentUser) {
         if (currentUser != null) {
             reviewViewModel.refreshReviewsByUserId(currentUser!!.id)
-            imageViewModel.refreshImage(currentUser!!.profileImageUrl)
+            userImage.value = imageViewModel.getImage(currentUser!!.profileImageUrl)
         }
     }
 
@@ -170,18 +165,16 @@ fun AccountScreen(
                                     galleryLauncher.launch("image/*")
                                 }
                         )
-                        // Image Loader
-                        var image = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888).asImageBitmap()
-                        if (userImage != null) {
-                            image = BitmapFactory.decodeByteArray(
-                                userImage!!.bytes, 0, userImage!!.bytes!!.size
-                            ).asImageBitmap()
+                        Box(
+                            modifier = Modifier
+                                .clip(shape = MaterialTheme.shapes.medium)
+                        ) {
+                            GlideImage(
+                                model = userImage.value,
+                                contentDescription = currentUser!!.displayName,
+                                modifier = Modifier.size(200.dp)
+                            )
                         }
-                        Image(
-                            bitmap = image,
-                            contentDescription = currentUser!!.displayName,
-                            modifier = Modifier.size(200.dp)
-                        )
                     }
                 }
 
@@ -211,22 +204,8 @@ fun AccountScreen(
                     Spacer(modifier = Modifier.height(30.dp))
                 }
 
-                items(reviews!!) { review ->
-                    val game by gameViewModel.getGameById(review.gameId).observeAsState()
-                    if (game == null) {
-                        LoadingAnimation()
-                    } else {
-                        val formatted_review =
-                            review.copy(title = game!!.name + " - " + review.title)
-                        ReviewBlock(review = formatted_review)
-                        Spacer(
-                            modifier = Modifier
-                                .height(10.dp)
-                                .fillMaxWidth()
-                                .background(MaterialTheme.colorScheme.background)
-                        )
-                    }
-                }
+                reviewList(reviews, addGameName = true)
+
                 item {
                     Spacer(modifier = Modifier.height(50.dp))
                 }
