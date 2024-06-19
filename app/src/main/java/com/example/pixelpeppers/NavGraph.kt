@@ -5,11 +5,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.pixelpeppers.models.Game
+import com.example.pixelpeppers.ui.screens.AccountScreen
 import com.example.pixelpeppers.ui.screens.GamePage
+import com.example.pixelpeppers.ui.screens.Login
 import com.example.pixelpeppers.ui.screens.MainMenu
 import com.example.pixelpeppers.ui.screens.Onboarding
 import com.example.pixelpeppers.ui.screens.Search
-import com.example.pixelpeppers.ui.screens.Login
 
 @Composable
 fun NavGraph(
@@ -30,7 +31,7 @@ fun NavGraph(
             MainMenu(
                 onGameClick = navigateGame,
                 onSearchClick = { navController.navigate(route = Route.Search.route) },
-                onAccountClick = { navController.navigate(route = Route.Login.route) },
+                onAccountClick = { navController.navigate(route = Route.Account.route) },
                 returnToOnboarding= { navController.navigate(route=Route.OnboardingIntro.route)}
             )
         }
@@ -50,6 +51,11 @@ fun NavGraph(
             GamePage(
                 gameID = it.arguments?.getString("gameID")?.toInt() ?: 17000,
             )
+        }
+        composable(
+            route = Route.Account.route
+        ) {
+            AccountScreen()
         }
     }
 }

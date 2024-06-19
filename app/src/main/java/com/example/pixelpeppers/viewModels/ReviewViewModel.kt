@@ -23,7 +23,15 @@ class ReviewViewModel
         }
     }
 
+    fun refreshReviewsByUserId(userId: String) {
+        viewModelScope.launch {
+            repository.refreshReviewsByUserId(userId)
+        }
+    }
+
     fun getReviewsByGameId(gameId: Int) = repository.getReviewsByGameId(gameId)
+
+    fun getReviewsByUserId(userId: String?) = repository.getReviewsByUserId(userId)
 
     fun deleteReview(reviewId: String) {
         viewModelScope.launch {

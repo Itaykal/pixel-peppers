@@ -31,8 +31,6 @@ import com.example.pixelpeppers.ui.components.GameCarousell
 import com.example.pixelpeppers.ui.components.LargeGamePreview
 import com.example.pixelpeppers.viewModels.GameViewModel
 import com.example.pixelpeppers.viewModels.UserViewModel
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 
 @Composable
 fun MainMenu(
@@ -47,7 +45,7 @@ fun MainMenu(
     val user by userViewModel.getUser().observeAsState()
     val state = rememberLazyListState()
     val trendingGame by gameViewModel.getGameById(17000).observeAsState()
-    val topics = listOf("stardew", "harry potter", "spider-man")
+    val topics = listOf("Stardew Valley", "World of Warcraft", "Grand Theft Auto", "Call of Duty", "Spider-Man")
     val gamesMap = topics.associateWith { gameViewModel.getGamesBySearch(it) }
 
     LaunchedEffect(Unit) {

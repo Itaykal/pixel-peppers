@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
@@ -36,14 +35,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asComposeColorFilter
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.example.pixelpeppers.R
 import com.example.pixelpeppers.models.Image
 import com.example.pixelpeppers.models.Review
 import com.example.pixelpeppers.viewModels.ImageViewModel
@@ -88,7 +85,6 @@ fun ReviewBlock(
             verticalAlignment = Alignment.Top,
             modifier = modifier.background(MaterialTheme.colorScheme.background)
         ) {
-            // @@ TODO: Add uID and user image fetching to viewmodel.
             Box(
                 modifier = Modifier.clip(CircleShape)
             ) {
@@ -97,13 +93,12 @@ fun ReviewBlock(
                         authorImage!!.bytes, 0, authorImage!!.bytes!!.size
                     ).asImageBitmap(),
                     contentDescription = author!!.displayName,
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(35.dp)
                 )
             }
             Column(
                 modifier = Modifier.padding(end = 30.dp)
             ) {
-                Spacer(modifier = Modifier.height(10.dp))
                 // Rating Stars and User name
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -122,8 +117,12 @@ fun ReviewBlock(
                     )
                 }
                 Row {
+                    var reviewTitle = review.title
+                    if (reviewTitle.length > 40) {
+                        reviewTitle = reviewTitle.substring(0, 40) + "..."
+                    }
                     Text(
-                        text = review.title,
+                        text = reviewTitle,
                         color = MaterialTheme.colorScheme.onBackground,
                         style = MaterialTheme.typography.titleMedium,
                         maxLines = 1,

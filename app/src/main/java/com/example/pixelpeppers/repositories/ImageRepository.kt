@@ -26,8 +26,8 @@ class ImageRepository(private val imageDao: ImageDao) {
         val newImageRef = imageRef.child(id)
         coroutineScope.launch(Dispatchers.IO) {
             newImageRef.putFile(imageUri).await()
+            refreshImage(id)
         }
-        refreshImage(id)
         return id
     }
 
@@ -41,9 +41,8 @@ class ImageRepository(private val imageDao: ImageDao) {
                 val bytes = targetImageRef.getBytes(HUNDRED_MEGABYTES).await()
                 val image = Image(id, bytes)
                 imageDao.insertImage(image)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            } catch (_: java.lang.Exception) {
+            } catch (_: Exception) {}
         }
     }
 

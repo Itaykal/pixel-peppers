@@ -196,7 +196,7 @@ fun GamePage(
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(5.dp),
                                 modifier = Modifier
-                                    .padding(start = 10.dp, bottom = 10.dp)
+                                    .padding(start = 10.dp, bottom = 30.dp)
                             ) {
                                 repeat(3) { index ->
                                     if (index < gameRes.genres.size) {

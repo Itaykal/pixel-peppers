@@ -35,11 +35,25 @@ class UserViewModel @Inject constructor(private val userRepository: UserReposito
         }
     }
 
-    fun refreshUser(id: String) {
+    fun refreshUser(id: String? = null) {
         viewModelScope.launch {
-            userRepository.refreshUser(id)
+            if (id == null) {
+                userRepository.refreshUser(Firebase.auth.currentUser!!.uid)
+            } else {
+                userRepository.refreshUser(id)
+            }
         }
     }
 
+    fun updateImage(id: String, imageURL: String) {
+        viewModelScope.launch {
+            userRepository.updateImage(id, imageURL)
+        }
+    }
 
+    fun updateDisplayName(id: String, displayName: String) {
+        viewModelScope.launch {
+            userRepository.updateDisplayName(id, displayName)
+        }
+    }
 }
