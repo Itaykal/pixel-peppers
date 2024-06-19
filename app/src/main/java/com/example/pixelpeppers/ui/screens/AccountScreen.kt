@@ -31,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -182,6 +183,8 @@ fun AccountScreen(
                     Row {
                         Text(
                             text = currentUser!!.displayName,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onBackground,
                             fontSize = 25.sp,
                         )
@@ -190,8 +193,8 @@ fun AccountScreen(
                             contentDescription = "Edit",
                             tint = MaterialTheme.colorScheme.onBackground,
                             modifier = Modifier
-                                .size(15.dp)
-                                .zIndex(1f)
+                                .size(20.dp)
+                                .padding(start = 5.dp)
                                 .clickable {
                                     editDisplayNameDialog.value = true
                                 }
