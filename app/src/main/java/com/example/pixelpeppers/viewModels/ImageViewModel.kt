@@ -1,13 +1,11 @@
 package com.example.pixelpeppers.viewModels
 
 import android.net.Uri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.pixelpeppers.models.Image
 import com.example.pixelpeppers.models.Review
 import com.example.pixelpeppers.repositories.ImageRepository
+import com.google.firebase.storage.StorageReference
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -18,17 +16,8 @@ class ImageViewModel
     private val repository: ImageRepository,
 ) : ViewModel() {
 
-    fun getImage(id: String?): LiveData<Image> {
-        if (id == null) {
-            return MutableLiveData()
-        }
+    fun getImage(id: String): StorageReference {
        return repository.getImage(id)
-    }
-
-    suspend fun refreshImage(id: String) {
-        viewModelScope.launch {
-            repository.refreshImage(id)
-        }
     }
 
     fun createImage(imageUri: Uri): String{
@@ -39,28 +28,10 @@ class ImageViewModel
         return id
     }
 
-    fun refreshReviewImages(review: Review) {
-        if (!review.imageIDs.isNullOrEmpty()) {
-            viewModelScope.launch {
-                repository.refreshImages(review.imageIDs)
-            }
-        }
-    }
-
-    fun refreshImages(ids: List<String>) {
-        viewModelScope.launch {
-            repository.refreshImages(ids)
-        }
-    }
-
-    fun getReviewImages(review: Review): LiveData<List<Image>> {
+    fun getReviewImages(review: Review): List<StorageReference> {
         if (!review.imageIDs.isNullOrEmpty()) {
             return repository.getImagesByIds(review.imageIDs)
         }
-        return MutableLiveData<List<Image>>()
-    }
-
-    fun getImagesByIds(ids: List<String>): LiveData<List<Image>> {
-        return repository.getImagesByIds(ids)
+        return emptyList()
     }
 }

@@ -17,4 +17,10 @@ interface UserDao {
 
     @Query("update users set onboarding_complete = :onBoardingComplete where id = :userID")
     fun updateOnBoarding(userID: String, onBoardingComplete: Boolean)
+
+    @Query("update users set profile_image_url = :imageURL where id = :id")
+     fun updateUserProfileImage(id: String, imageURL: String)
+
+     @Query("update users set display_name = :displayName where id = :id")
+     fun updateDisplayName(id: String, displayName: String)
 }

@@ -6,8 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.material3.Text
-import androidx.compose.ui.graphics.Color
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.pixelpeppers.coordinators.dataCoordinator.DataCoordinator
 import com.example.pixelpeppers.ui.theme.PixelPeppersTheme
@@ -42,7 +40,6 @@ class MainActivity : ComponentActivity(
         }
         setContent {
             PixelPeppersTheme {
-                Text(text = route.route, color = Color.White)
                 NavGraph(
                     startDestination = route.route,
                 )

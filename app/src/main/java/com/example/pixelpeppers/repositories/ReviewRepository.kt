@@ -1,6 +1,7 @@
 package com.example.pixelpeppers.repositories
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.pixelpeppers.models.CreateReview
 import com.example.pixelpeppers.models.Review
 import com.example.pixelpeppers.models.UpdateReview
@@ -78,10 +79,32 @@ class ReviewRepository(private val reviewDao: ReviewDao) {
         return reviewDao.getReviewsByGame(gameId)
     }
 
+    fun getReviewsByUserId(userId: String?): LiveData<List<Review>> {
+        if (userId == null) {
+            return MutableLiveData(emptyList())
+        }
+        return reviewDao.getReviewsByUserID(userId)
+    }
+
     suspend fun refreshReviewsByGameId(gameId: Int) {
         try {
             val reviews = collection
                 .whereEqualTo("gameId", gameId)
+                .get()
+                .await()
+                .toObjects(Review::class.java)
+            coroutineScope.launch(Dispatchers.IO) {
+                reviewDao.insertAll(reviews)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    suspend fun refreshReviewsByUserId(userId: String) {
+        try {
+            val reviews = collection
+                .whereEqualTo("userId", userId)
                 .get()
                 .await()
                 .toObjects(Review::class.java)

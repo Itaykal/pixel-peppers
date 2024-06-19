@@ -2,11 +2,10 @@ package com.example.pixelpeppers.repositories
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import androidx.room.Update
-import com.example.pixelpeppers.models.User
-import com.example.pixelpeppers.offlineCaching.daos.UserDao
 import com.example.pixelpeppers.clients.UserClient
 import com.example.pixelpeppers.models.UpdateUser
+import com.example.pixelpeppers.models.User
+import com.example.pixelpeppers.offlineCaching.daos.UserDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -52,5 +51,20 @@ class UserRepository(
         coroutineScope.launch(Dispatchers.IO) {
             userDao.updateOnBoarding(userId, value)
         }
+    }
+
+    suspend fun updateImage(id: String, imageURL: String) {
+        userClient.updateUser(id, UpdateUser(profileImageUrl = imageURL))
+        coroutineScope.launch(Dispatchers.IO) {
+            userDao.updateUserProfileImage(id, imageURL)
+        }
+    }
+
+    suspend fun updateDisplayName(id: String, displayName: String) {
+        userClient.updateUser(id, UpdateUser(displayName = displayName))
+        coroutineScope.launch(Dispatchers.IO) {
+            userDao.updateDisplayName(id, displayName)
+        }
+
     }
 }

@@ -41,7 +41,7 @@ fun GamePreview(
         var imageURL = game.cover?.url ?: defaultImageURL
         imageURL = imageURL.replace(ImageSize.THUMB.size, imageSize.size)
 
-        var boxClippingMod = if (clipping) Modifier.clip(shape= MaterialTheme.shapes.extraLarge) else Modifier
+        var boxClippingMod = if (clipping) Modifier.clip(shape=MaterialTheme.shapes.extraLarge) else Modifier
         Box(
             modifier = boxClippingMod
         )

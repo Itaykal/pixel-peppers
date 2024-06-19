@@ -5,7 +5,6 @@ import com.example.pixelpeppers.clients.GameClient
 import com.example.pixelpeppers.clients.UserClient
 import com.example.pixelpeppers.offlineCaching.daos.GameDao
 import com.example.pixelpeppers.offlineCaching.daos.GenreDao
-import com.example.pixelpeppers.offlineCaching.daos.ImageDao
 import com.example.pixelpeppers.offlineCaching.daos.ReviewDao
 import com.example.pixelpeppers.offlineCaching.daos.UserDao
 import com.example.pixelpeppers.repositories.GameRepository
@@ -44,8 +43,8 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideImagesRepository(imageDao: ImageDao): ImageRepository {
-        return ImageRepository(imageDao)
+    fun provideImagesRepository(): ImageRepository {
+        return ImageRepository()
     }
 
     @Singleton
