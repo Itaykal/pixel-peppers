@@ -26,6 +26,7 @@ class ImageRepository(private val imageDao: ImageDao) {
         val newImageRef = imageRef.child(id)
         coroutineScope.launch(Dispatchers.IO) {
             newImageRef.putFile(imageUri).await()
+            refreshImage(id)
         }
         refreshImage(id)
         return id

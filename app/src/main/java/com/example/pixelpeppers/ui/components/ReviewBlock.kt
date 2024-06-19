@@ -25,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -36,14 +37,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asComposeColorFilter
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.example.pixelpeppers.R
 import com.example.pixelpeppers.models.Image
 import com.example.pixelpeppers.models.Review
 import com.example.pixelpeppers.viewModels.ImageViewModel
@@ -54,6 +53,7 @@ import com.example.pixelpeppers.viewModels.UserViewModel
 fun ReviewBlock(
     review: Review,
     modifier: Modifier = Modifier,
+    onFinishLoading: () -> Unit = {},
     imageViewModel: ImageViewModel = hiltViewModel(),
     userViewModel: UserViewModel = hiltViewModel(),
 ) {
@@ -67,28 +67,21 @@ fun ReviewBlock(
 
 
     LaunchedEffect(Unit) {
-        imageViewModel.refreshImages(review)
+        imageViewModel.refreshReviewImages(review)
         userViewModel.refreshUser(review.authorId)
     }
     LaunchedEffect(author) {
-        if (author != null) {
-            println("Refreshing Image")
-            imageViewModel.refreshImage(author!!.profileImageUrl)
-        }
+        author?.let { imageViewModel.refreshImage(it.profileImageUrl) }
     }
-    if (author == null || authorImage == null) {
-        LoadingAnimation(
-            modifier = modifier.padding(
-                horizontal = 10.dp
-            )
-        )
-    } else {
+    if (author != null && authorImage != null)  {
+        LaunchedEffect(Unit) {
+            onFinishLoading()
+        }
         Row(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.Top,
             modifier = modifier.background(MaterialTheme.colorScheme.background)
         ) {
-            // @@ TODO: Add uID and user image fetching to viewmodel.
             Box(
                 modifier = Modifier.clip(CircleShape)
             ) {

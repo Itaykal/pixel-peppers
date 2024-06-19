@@ -1,8 +1,6 @@
 package com.example.pixelpeppers.ui.screens
 
 import LoadingAnimation
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,14 +37,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.pixelpeppers.R
-import com.example.pixelpeppers.models.CreateReview
 import com.example.pixelpeppers.models.ImageSize
 import com.example.pixelpeppers.ui.components.GamePreview
 import com.example.pixelpeppers.ui.components.GenreTag
 import com.example.pixelpeppers.ui.components.ReviewBlock
 import com.example.pixelpeppers.ui.components.ReviewDialog
 import com.example.pixelpeppers.viewModels.GameViewModel
-import com.example.pixelpeppers.viewModels.ImageViewModel
 import com.example.pixelpeppers.viewModels.ReviewViewModel
 
 @Composable
@@ -55,18 +51,10 @@ fun GamePage(
     gameID: Int = 17000,
     gameViewModel: GameViewModel = hiltViewModel(),
     reviewViewModel: ReviewViewModel = hiltViewModel(),
-    imageViewModel: ImageViewModel = hiltViewModel(),
 ) {
     val showReviewDialog = remember { mutableStateOf(false) }
     val lazyListState = rememberLazyListState()
-    val uploadingFinished = remember { mutableStateOf(true) }
-    val imageIDs = remember { mutableListOf<String>() }
-    val galleryLauncher =  rememberLauncherForActivityResult(GetContent()) { imageUri ->
-        imageUri?.let {
-            imageIDs.add(imageViewModel.createImage(imageUri))
-            uploadingFinished.value = true
-        }
-    }
+
     val firstItemTranslationY by remember {
         derivedStateOf {
             when {
@@ -112,28 +100,10 @@ fun GamePage(
 
             if (showReviewDialog.value) {
                 ReviewDialog(
-                    openGallery ={
-                        galleryLauncher.launch("image/*")
-                        uploadingFinished.value = false
-                    },
-                    uploadingImages = uploadingFinished.value,
-                    onSubmit = { title, description, rating ->
-                        reviewViewModel.addReview(
-                            CreateReview(
-                                gameId = gameRes.id,
-                                rating = rating,
-                                title = title,
-                                description = description,
-                                imageIDs = imageIDs
-                            )
-                        )
+                    closeDialog = {
                         showReviewDialog.value = false
-                        uploadingFinished.value = true
                     },
-                    onDismissRequest = {
-                        showReviewDialog.value = false
-                        uploadingFinished.value = false
-                    }
+                    gameID = gameID
                 )
             }
 
@@ -211,9 +181,10 @@ fun GamePage(
                             }
                         }
                     }
+                    val loading: Array<Boolean> = reviews!!.map { true }.toTypedArray()
 
                     itemsIndexed(reviews!!) { index, review ->
-                        ReviewBlock(review = review)
+                        ReviewBlock(review = review, onFinishLoading = { loading[index] = false })
                         Spacer(
                             modifier = Modifier
                                 .height(10.dp)
@@ -227,6 +198,11 @@ fun GamePage(
                                     .fillMaxWidth()
                                     .background(MaterialTheme.colorScheme.background)
                             )
+                        }
+                    }
+                    if (loading.any { it }) {
+                        item {
+                            LoadingAnimation()
                         }
                     }
                 }
