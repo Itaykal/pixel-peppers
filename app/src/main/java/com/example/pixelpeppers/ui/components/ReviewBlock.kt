@@ -1,5 +1,6 @@
 package com.example.pixelpeppers.ui.components
 
+import LoadingAnimation
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PorterDuff
@@ -46,105 +47,95 @@ import com.example.pixelpeppers.R
 import com.example.pixelpeppers.models.Image
 import com.example.pixelpeppers.models.Review
 import com.example.pixelpeppers.viewModels.ImageViewModel
+import com.example.pixelpeppers.viewModels.UserViewModel
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ReviewBlock(
     review: Review,
     modifier: Modifier = Modifier,
-    imageViewModel: ImageViewModel = hiltViewModel()
+    imageViewModel: ImageViewModel = hiltViewModel(),
+    userViewModel: UserViewModel = hiltViewModel(),
 ) {
+    val author by userViewModel.getUser(review.authorId).observeAsState()
+    val imageList by imageViewModel.getReviewImages(review).observeAsState()
+    val authorImage by imageViewModel.getImage(author?.profileImageUrl).observeAsState()
     val minimumLineLength = 4
     val expandedState = remember { mutableStateOf(false) }
     val showReadMoreButtonState = remember { mutableStateOf(false) }
     val maxLines = if (expandedState.value) 200 else minimumLineLength
 
-    val imageList by imageViewModel.getReviewImages(review).observeAsState()
 
     LaunchedEffect(Unit) {
         imageViewModel.refreshImages(review)
+        userViewModel.refreshUser(review.authorId)
     }
-
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalAlignment = Alignment.Top,
-        modifier = modifier
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        // @@ TODO: Add uID and user image fetching to viewmodel.
-        Box(
-            modifier = Modifier
-                .clip(CircleShape)
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.user),
-                contentDescription = review.authorDisplayName,
-                modifier = Modifier
-                    .size(40.dp)
-            )
+    LaunchedEffect(author) {
+        if (author != null) {
+            println("Refreshing Image")
+            imageViewModel.refreshImage(author!!.profileImageUrl)
         }
-        Column(
-            modifier = Modifier.padding(end = 30.dp)
+    }
+    if (author == null || authorImage == null) {
+        LoadingAnimation(
+            modifier = modifier.padding(
+                horizontal = 10.dp
+            )
+        )
+    } else {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.Top,
+            modifier = modifier.background(MaterialTheme.colorScheme.background)
         ) {
-            Spacer(modifier = Modifier.height(10.dp))
-            // Rating Stars and User name
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalAlignment = Alignment.CenterVertically
+            // @@ TODO: Add uID and user image fetching to viewmodel.
+            Box(
+                modifier = Modifier.clip(CircleShape)
             ) {
-                Text(
-                    text = review.authorDisplayName,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    style = MaterialTheme.typography.titleSmall,
-                    maxLines = 1,
-                    modifier = Modifier
-                        .alpha(0.8f),
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Rating(
-                    rating = review.rating,
-                    modifier = Modifier
-                        .alpha(0.5f)
+                Image(
+                    bitmap = BitmapFactory.decodeByteArray(
+                        authorImage!!.bytes, 0, authorImage!!.bytes!!.size
+                    ).asImageBitmap(),
+                    contentDescription = author!!.displayName,
+                    modifier = Modifier.size(40.dp)
                 )
             }
-            Row(
-
+            Column(
+                modifier = Modifier.padding(end = 30.dp)
             ) {
-                Text(
-                    text = review.title,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1,
-                )
-            }
-            // Pictures
-            if (review.imageIDs != null) {
-                if (review.imageIDs.isNotEmpty()) {
-                    val showImageDialog = remember { mutableStateOf(false) }
-                    val zoomedImage = remember { mutableStateOf<Image?>(null) }
-                    val mediaListState = rememberLazyListState()
-
-                    if (showImageDialog.value) {
-                        Dialog(onDismissRequest = {
-                            showImageDialog.value = false
-                            zoomedImage.value = null
-                        }) {
-                            Image(
-                                bitmap = BitmapFactory.decodeByteArray(
-                                    zoomedImage.value!!.bytes,
-                                    0,
-                                    zoomedImage.value!!.bytes!!.size
-                                ).asImageBitmap(),
-                                contentDescription = "",
-                                modifier = Modifier
-                                    .size(300.dp)
-                                    .clip(MaterialTheme.shapes.large)
-                            )
-                        }
-
-                    }
-
+                Spacer(modifier = Modifier.height(10.dp))
+                // Rating Stars and User name
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = author!!.displayName,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.titleSmall,
+                        maxLines = 1,
+                        modifier = Modifier.alpha(0.8f),
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Rating(
+                        rating = review.rating, modifier = Modifier.alpha(0.5f)
+                    )
+                }
+                Row {
+                    Text(
+                        text = review.title,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                    )
+                }
+                // Pictures
+                if (review.imageIDs != null) {
                     if (!imageList.isNullOrEmpty()) {
+                        val mediaListState = rememberLazyListState()
+                        val showImageDialog = remember { mutableStateOf(false) }
+                        val zoomedImage = remember { mutableStateOf<Image?>(null) }
+
                         LazyRow(
                             state = mediaListState,
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -154,17 +145,13 @@ fun ReviewBlock(
                                 .padding(top = 10.dp, bottom = 10.dp),
                         ) {
                             items(imageList!!) { image ->
-                                Image(
-                                    bitmap = BitmapFactory.decodeByteArray(
-                                        image.bytes,
-                                        0,
-                                        image.bytes!!.size
-                                    ).asImageBitmap(),
+                                Image(bitmap = BitmapFactory.decodeByteArray(
+                                    image.bytes, 0, image.bytes!!.size
+                                ).asImageBitmap(),
                                     contentDescription = "",
                                     contentScale = ContentScale.Crop,
                                     colorFilter = PorterDuffColorFilter(
-                                        Color.GRAY,
-                                        PorterDuff.Mode.MULTIPLY
+                                        Color.GRAY, PorterDuff.Mode.MULTIPLY
                                     ).asComposeColorFilter(),
                                     modifier = Modifier
                                         .size(100.dp)
@@ -172,44 +159,62 @@ fun ReviewBlock(
                                         .clickable {
                                             showImageDialog.value = true
                                             zoomedImage.value = image
-                                        }
+                                        })
+                            }
+                        }
+
+                        if (showImageDialog.value) {
+                            Dialog(onDismissRequest = {
+                                showImageDialog.value = false
+                                zoomedImage.value = null
+                            }) {
+                                Image(
+                                    bitmap = BitmapFactory.decodeByteArray(
+                                        zoomedImage.value!!.bytes,
+                                        0,
+                                        zoomedImage.value!!.bytes!!.size
+                                    ).asImageBitmap(),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .size(300.dp)
+                                        .clip(MaterialTheme.shapes.large)
                                 )
                             }
+
                         }
                     }
                 }
-            }
 
-            // Review Content with read more option
-            Row(
+                // Review Content with read more option
+                Row(
 
-            ) {
-                Text(
-                    text = review.description ?: "",
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = maxLines,
-                    onTextLayout = { textLayoutResult: TextLayoutResult ->
-                        if (textLayoutResult.lineCount > minimumLineLength - 1) {
-                            if (textLayoutResult.isLineEllipsized(minimumLineLength - 1)) showReadMoreButtonState.value =
-                                true
-                        }
-                    },
-                )
-            }
-            if (showReadMoreButtonState.value) {
-                Text(
-                    text = if (expandedState.value) "Show Less" else "Read More",
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier
-                        .alpha(0.4f)
-                        .clickable {
-                            expandedState.value = !expandedState.value
+                ) {
+                    Text(
+                        text = review.description ?: "",
+                        color = MaterialTheme.colorScheme.onBackground,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = maxLines,
+                        onTextLayout = { textLayoutResult: TextLayoutResult ->
+                            if (textLayoutResult.lineCount > minimumLineLength - 1) {
+                                if (textLayoutResult.isLineEllipsized(minimumLineLength - 1)) showReadMoreButtonState.value =
+                                    true
+                            }
                         },
-
                     )
+                }
+                if (showReadMoreButtonState.value) {
+                    Text(
+                        text = if (expandedState.value) "Show Less" else "Read More",
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier
+                            .alpha(0.4f)
+                            .clickable {
+                                expandedState.value = !expandedState.value
+                            },
+
+                        )
+                }
             }
         }
     }
 }
-

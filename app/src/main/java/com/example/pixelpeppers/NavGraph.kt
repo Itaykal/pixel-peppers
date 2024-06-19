@@ -1,7 +1,6 @@
 package com.example.pixelpeppers
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -23,12 +22,7 @@ fun NavGraph(
         composable(
             route = Route.OnboardingIntro.route
         ) {
-            Onboarding(page = 0, navController = navController)
-        }
-        composable(
-            route = Route.OnboardingTags.route
-        ) {
-            Onboarding(page = 1, navController = navController)
+            Onboarding(navigateToMenu = {navController.navigate(route = Route.Menu.route)})
         }
         composable(
             route = Route.Menu.route
@@ -43,7 +37,7 @@ fun NavGraph(
         composable(
             route = Route.Login.route
         ) {
-            Login(navController = navController)
+            Login()
         }
         composable(
             route = Route.Search.route

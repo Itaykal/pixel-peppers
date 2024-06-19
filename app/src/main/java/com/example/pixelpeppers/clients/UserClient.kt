@@ -85,10 +85,9 @@ class UserClient(private val okHttpClient: OkHttpClient) {
         accessTokenResponse
     }
 
-    suspend fun updateUser(updateUser: UpdateUser) {
-        val id = auth.currentUser!!.uid
+    suspend fun updateUser(userID: String, updateUser: UpdateUser) {
         collection
-            .document(id)
+            .document(userID)
             .update(
                 updateUser.toMap()
             ).await()

@@ -20,6 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,8 +31,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import com.example.pixelpeppers.Route
 import com.example.pixelpeppers.models.Cover
 import com.example.pixelpeppers.models.Game
 import com.example.pixelpeppers.models.Genre
@@ -41,6 +41,8 @@ import com.example.pixelpeppers.ui.components.PageIndicator
 import com.example.pixelpeppers.ui.components.PixelPeppersButton
 import com.example.pixelpeppers.viewModels.GenreViewModel
 import com.example.pixelpeppers.viewModels.UserViewModel
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 var g = Game(
     id = 17000,
@@ -52,12 +54,13 @@ var g = Game(
 @Composable
 fun Onboarding(
     modifier: Modifier = Modifier,
-    page: Int = 0,
-    navController: NavController,
     genreViewModel: GenreViewModel = hiltViewModel(),
-    userViewModel: UserViewModel = hiltViewModel()
+    userViewModel: UserViewModel = hiltViewModel(),
+    navigateToMenu: () -> Unit,
 ) {
-    val user by userViewModel.user.observeAsState()
+
+    val user by userViewModel.getUser().observeAsState()
+    val page = remember { mutableStateOf(0) }
     LaunchedEffect(user) {
         if (user != null) {
             genreViewModel.refreshGenres()
@@ -72,6 +75,9 @@ fun Onboarding(
         ) {
             LoadingAnimation()
         }
+    } else if (page.value >= 2) {
+        navigateToMenu()
+        userViewModel.updateOnBoarding(user!!.id, true)
     } else {
         Scaffold(
             modifier = modifier
@@ -82,24 +88,19 @@ fun Onboarding(
                 contentAlignment = Alignment.TopCenter,
                 modifier = modifier
             ) {
-                PageIndicator(totalPages = 2, currentPage = page)
+                PageIndicator(totalPages = 2, currentPage = page.value)
                 PixelPeppersButton(
                     text = "Next",
                     onClick = {
-                        if (page == 0) {
-                            navController.navigate(route = Route.OnboardingTags.route)
-                        } else {
-                            navController.navigate(route = Route.Menu.route)
-                            userViewModel.updateUser(UpdateUser(onboardingComplete = true))
-                        }
+                        page.value++
                     })
-                if (page == 0) {
+                if (page.value == 0) {
                     OnboardingIntro(
                         modifier = modifier
                             .padding(paddingValues)
                             .fillMaxSize(),
                     )
-                } else if (page == 1) {
+                } else if (page.value == 1) {
                     OnboardingTags(
                         modifier = modifier
                             .padding(paddingValues)

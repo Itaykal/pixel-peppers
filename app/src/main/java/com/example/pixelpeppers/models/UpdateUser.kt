@@ -3,6 +3,7 @@ package com.example.pixelpeppers.models
 data class UpdateUser(
     val displayName: String? = null,
     val onboardingComplete: Boolean? = null,
+    val profileImageUrl: String? = null,
 ) {
     fun toMap(): Map<String, Any?> {
         val map = mutableMapOf<String, Any?>()
@@ -12,12 +13,9 @@ data class UpdateUser(
         if (onboardingComplete != null) {
             map["onboarding_complete"] = onboardingComplete
         }
+        if (profileImageUrl != null) {
+            map["profile_image_url"] = profileImageUrl
+        }
         return map
-    }
-    fun updateUser(user: User): User {
-        return user.copy(
-            displayName = displayName ?: user.displayName,
-            onboardingComplete = onboardingComplete ?: user.onboardingComplete
-        )
     }
 }

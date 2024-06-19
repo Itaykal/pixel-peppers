@@ -35,7 +35,6 @@ class ReviewRepository(private val reviewDao: ReviewDao) {
             rating = createReview.rating,
             title = createReview.title,
             authorId = currentUser.uid,
-            authorDisplayName = currentUser.displayName!!,
             imageIDs = createReview.imageIDs,
             createdAt = Instant.now().toEpochMilli(),
         )
