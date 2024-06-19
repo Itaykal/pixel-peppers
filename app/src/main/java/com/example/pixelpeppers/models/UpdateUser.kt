@@ -13,7 +13,7 @@ data class UpdateUser(
         if (onboardingComplete != null) {
             map["onboarding_complete"] = onboardingComplete
         }
-        if (onboardingComplete != null) {
+        if (profileImageUrl != null) {
             map["profile_image_url"] = profileImageUrl
         }
         return map
