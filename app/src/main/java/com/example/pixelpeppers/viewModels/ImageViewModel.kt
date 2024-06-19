@@ -39,11 +39,17 @@ class ImageViewModel
         return id
     }
 
-    fun refreshImages(review: Review) {
+    fun refreshReviewImages(review: Review) {
         if (!review.imageIDs.isNullOrEmpty()) {
             viewModelScope.launch {
                 repository.refreshImages(review.imageIDs)
             }
+        }
+    }
+
+    fun refreshImages(ids: List<String>) {
+        viewModelScope.launch {
+            repository.refreshImages(ids)
         }
     }
 
@@ -52,5 +58,9 @@ class ImageViewModel
             return repository.getImagesByIds(review.imageIDs)
         }
         return MutableLiveData<List<Image>>()
+    }
+
+    fun getImagesByIds(ids: List<String>): LiveData<List<Image>> {
+        return repository.getImagesByIds(ids)
     }
 }
