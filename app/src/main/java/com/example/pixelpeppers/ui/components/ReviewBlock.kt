@@ -60,6 +60,7 @@ fun ReviewBlock(
     review: Review,
     modifier: Modifier = Modifier,
     onFinishLoading: () -> Unit = {},
+    onEdit: (Review) -> Unit = {},
     addGameName: Boolean = false,
     imageViewModel: ImageViewModel = hiltViewModel(),
     userViewModel: UserViewModel = hiltViewModel(),
@@ -161,6 +162,9 @@ fun ReviewBlock(
                         color = MaterialTheme.colorScheme.onBackground,
                         style = MaterialTheme.typography.titleMedium,
                         maxLines = 1,
+                        // @@ TODO: PLEASE REMOVE THIS!!!!!! USE EDIT BUTTON INSTEAD
+                        modifier = Modifier
+                            .clickable { onEdit(review) }
                     )
                 }
                 // Pictures
