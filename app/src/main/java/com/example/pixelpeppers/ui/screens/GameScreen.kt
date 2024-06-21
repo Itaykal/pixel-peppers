@@ -56,7 +56,6 @@ fun GamePage(
     userViewModel: UserViewModel = hiltViewModel(),
     ) {
     val showReviewDialog = remember { mutableStateOf(false) }
-    val reviewToEdit = remember { mutableStateOf<Review?>(null) }
     val currentUser by userViewModel.getUser().observeAsState()
     val lazyListState = rememberLazyListState()
 
@@ -106,20 +105,13 @@ fun GamePage(
 
             if (showReviewDialog.value) {
                 ReviewDialog(
-                    closeDialog = {
+                    onDismiss = {
+                        showReviewDialog.value = false
+                    },
+                    onSubmit = {
                         showReviewDialog.value = false
                     },
                     gameID = gameID
-                )
-            }
-
-            if (reviewToEdit.value != null) {
-                ReviewEditDialog(
-                    closeDialog = {
-                        reviewToEdit.value = null
-                    },
-                    review = reviewToEdit.value!!,
-                    onSave = {},
                 )
             }
 
@@ -198,12 +190,8 @@ fun GamePage(
                         }
                     }
                     reviewList(
-                        reviews,
-                        onEdit = { review ->
-                            if (currentUser!!.id == review.authorId) {
-                                reviewToEdit.value = review
-                            }
-                        }
+                        reviews!!,
+                        editable = false,
                     )
                 }
                 FloatingActionButton(

@@ -1,6 +1,5 @@
 package com.example.pixelpeppers.ui.components
 
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
@@ -50,9 +48,9 @@ import com.example.pixelpeppers.viewModels.GameViewModel
 import com.example.pixelpeppers.viewModels.ImageViewModel
 import com.example.pixelpeppers.viewModels.ReviewViewModel
 import com.example.pixelpeppers.viewModels.UserViewModel
-import com.google.firebase.storage.StorageReference
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.firebase.storage.StorageReference
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -61,6 +59,7 @@ fun ReviewBlock(
     modifier: Modifier = Modifier,
     onFinishLoading: () -> Unit = {},
     onEdit: (Review) -> Unit = {},
+    editable: Boolean = false,
     addGameName: Boolean = false,
     imageViewModel: ImageViewModel = hiltViewModel(),
     userViewModel: UserViewModel = hiltViewModel(),
@@ -77,11 +76,13 @@ fun ReviewBlock(
     val imageList = remember { mutableStateListOf<StorageReference>() }
     val authorImage = remember { mutableStateOf<StorageReference?>(null) }
 
-    val deletingState = remember { mutableStateOf(false) }
-
     LaunchedEffect(Unit) {
         userViewModel.refreshUser(review.authorId)
         gameViewModel.refreshGamesByID(review.gameId)
+    }
+
+    LaunchedEffect(review.imageIDs) {
+        imageList.clear()
         imageList.addAll(imageViewModel.getReviewImages(review))
     }
 
@@ -127,13 +128,15 @@ fun ReviewBlock(
                         rating = review.rating, modifier = modifier.alpha(0.5f)
                     )
                     // Edit icons
-                    if (Firebase.auth.currentUser?.uid == review.authorId) {
+                    if (editable && Firebase.auth.currentUser?.uid == review.authorId) {
                         Icon(
                             imageVector = Icons.Outlined.Edit,
                             contentDescription = "Edit",
                             modifier = modifier
                                 .size(16.dp)
-                                .clickable { },
+                                .clickable {
+                                    onEdit(review)
+                                },
                             tint = MaterialTheme.colorScheme.onBackground
                         )
                         Icon(
@@ -142,7 +145,6 @@ fun ReviewBlock(
                             modifier = modifier
                                 .size(16.dp)
                                 .clickable {
-                                    deletingState.value = true
                                     reviewViewModel.deleteReview(review.id)
                                 },
                             tint = MaterialTheme.colorScheme.error
@@ -162,9 +164,6 @@ fun ReviewBlock(
                         color = MaterialTheme.colorScheme.onBackground,
                         style = MaterialTheme.typography.titleMedium,
                         maxLines = 1,
-                        // @@ TODO: PLEASE REMOVE THIS!!!!!! USE EDIT BUTTON INSTEAD
-                        modifier = Modifier
-                            .clickable { onEdit(review) }
                     )
                 }
                 // Pictures
@@ -181,7 +180,7 @@ fun ReviewBlock(
                             .fillMaxWidth()
                             .padding(top = 10.dp, bottom = 10.dp),
                     ) {
-                        items(imageList) { image ->
+                        items(imageList, key= { it.name }) { image ->
                             GlideImage(
                                 model = image,
                                 contentDescription = "",
@@ -206,7 +205,7 @@ fun ReviewBlock(
                             zoomedImage.value = null
                         }) {
                             GlideImage(
-                               model = zoomedImage.value,
+                                model = zoomedImage.value,
                                 contentDescription = "",
                                 modifier = Modifier
                                     .size(300.dp)

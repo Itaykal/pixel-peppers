@@ -42,35 +42,34 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.pixelpeppers.models.CreateReview
-import com.example.pixelpeppers.models.Review
 import com.example.pixelpeppers.models.UpdateReview
-import com.example.pixelpeppers.viewModels.ImageViewModel
 import com.example.pixelpeppers.viewModels.ReviewViewModel
+import com.google.firebase.storage.StorageReference
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ReviewDialog(
-    closeDialog: () -> Unit,
+    onDismiss: () -> Unit,
+    onSubmit: () -> Unit,
     gameID: Int,
     modifier: Modifier = Modifier,
-    reviewID: String? = null,
+    editReviewID: String? = null,
     title: MutableState<String> = mutableStateOf(""),
     description: MutableState<String?> = mutableStateOf(""),
     rating: MutableState<Int> = mutableIntStateOf(1),
-    imageUris: SnapshotStateList<Uri> = remember { SnapshotStateList() },
-    imageViewModel: ImageViewModel = hiltViewModel(),
+    imageModels: SnapshotStateList<Any> = remember { SnapshotStateList() },
     reviewViewModel: ReviewViewModel = hiltViewModel(),
 ) {
     val previewState = rememberLazyListState()
     val isTitleValid = remember { mutableStateOf(title.value.isNotEmpty()) }
     val galleryLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetMultipleContents()) {
-            imageUris.apply {
+            imageModels.apply {
                 clear()
                 addAll(it)
             }
         }
-    Dialog(onDismissRequest = closeDialog) {
+    Dialog(onDismissRequest = onDismiss) {
         Box(
             modifier = modifier
                 .background(MaterialTheme.colorScheme.onTertiary)
@@ -102,7 +101,7 @@ fun ReviewDialog(
                     galleryLauncher.launch("image/*")
                 }) {
                     Text(
-                        text = "Add Images",
+                        text = if (editReviewID == null ) "Add Images" else "Update Images",
                     )
                 }
                 LazyRow(
@@ -113,7 +112,7 @@ fun ReviewDialog(
                         .fillMaxWidth()
                         .padding(top = 10.dp, bottom = 10.dp),
                 ) {
-                    items(imageUris) { uri ->
+                    items(imageModels) { uri ->
                         GlideImage(model = uri,
                             contentDescription = "preview",
                             transition = CrossFade,
@@ -124,7 +123,7 @@ fun ReviewDialog(
                             modifier = modifier
                                 .size(50.dp)
                                 .clickable {
-                                    imageUris.remove(uri)
+                                    imageModels.remove(uri)
                                 }) {
                             it.diskCacheStrategy(DiskCacheStrategy.ALL)
                                 .transform(RoundedCorners(70))
@@ -135,31 +134,36 @@ fun ReviewDialog(
                     Button(
                         enabled = isTitleValid.value,
                         onClick = {
-                            val imageIDs = imageUris.map { imageViewModel.createImage(it) }
-                            if (reviewID == null) {
+                            val imageUri = imageModels.filterIsInstance<Uri>()
+                            val imageIDs =
+                                imageModels.filterIsInstance<StorageReference>().map { it.name }
+                            if (editReviewID == null) {
                                 reviewViewModel.addReview(
                                     CreateReview(
                                         gameId = gameID,
                                         rating = rating.value,
                                         title = title.value,
                                         description = description.value,
-                                        imageIDs = imageIDs
-                                    )
+                                        imageIDs = imageIDs,
+                                    ),
+                                    imageUris = imageUri,
                                 )
                             } else {
                                 reviewViewModel.updateReview(
-                                    reviewID,
+                                    editReviewID,
                                     UpdateReview(
                                         rating = rating.value,
                                         title = title.value,
                                         description = description.value,
-                                    )
+                                        imageIDs = imageIDs,
+                                    ),
+                                    imageUris = imageUri,
                                 )
                             }
                             title.value = ""
                             description.value = ""
                             rating.value = 1
-                            closeDialog()
+                            onSubmit()
                         }
                     ) {
                         Text(

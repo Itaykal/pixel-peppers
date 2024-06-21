@@ -1,10 +1,12 @@
 package com.example.pixelpeppers.viewModels
 
 import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pixelpeppers.models.User
+import com.example.pixelpeppers.repositories.ImageRepository
 import com.example.pixelpeppers.repositories.UserRepository
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -13,7 +15,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class UserViewModel @Inject constructor(private val userRepository: UserRepository) : ViewModel() {
+class UserViewModel @Inject constructor(
+    private val userRepository: UserRepository,
+    private val imageRepository: ImageRepository,
+) : ViewModel() {
     fun startTwitchAuthActivity(context: Context) {
         userRepository.startTwitchAuthActivity(context)
     }
@@ -45,9 +50,10 @@ class UserViewModel @Inject constructor(private val userRepository: UserReposito
         }
     }
 
-    fun updateImage(id: String, imageURL: String) {
+    fun updateImage(id: String, imageURL: Uri) {
         viewModelScope.launch {
-            userRepository.updateImage(id, imageURL)
+            val imageId = imageRepository.createImage(imageURL)
+            userRepository.updateImage(id, imageId)
         }
     }
 

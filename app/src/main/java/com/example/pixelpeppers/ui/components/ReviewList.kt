@@ -9,23 +9,30 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.pixelpeppers.models.Review
 
 fun LazyListScope.reviewList(
-    reviews: List<Review>?,
+    reviews: List<Review>,
     addGameName: Boolean = false,
-    onEdit: (Review) -> Unit = {}
+    onEdit: (Review) -> Unit = {},
+    editable: Boolean = false,
 ) {
-    val loading: Array<Boolean> = reviews!!.map { true }.toTypedArray()
-
-    itemsIndexed(reviews) { index, review ->
+    if (reviews.isEmpty()) {
+        item {
+            Text(text="No reviews yet", color = MaterialTheme.colorScheme.onBackground,)
+        }
+    }
+    itemsIndexed(reviews, key = { _, review -> review.id }) { index, review ->
         ReviewBlock(
             review = review,
-            onFinishLoading = { loading[index] = false },
             addGameName = addGameName,
-            onEdit = { r -> onEdit(r) }
+            onEdit = { r -> onEdit(r) },
+            editable=editable,
         )
         Spacer(
             modifier = Modifier
@@ -40,11 +47,6 @@ fun LazyListScope.reviewList(
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.background)
             )
-        }
-    }
-    if (loading.any { it }) {
-        item {
-            LoadingAnimation()
         }
     }
 }

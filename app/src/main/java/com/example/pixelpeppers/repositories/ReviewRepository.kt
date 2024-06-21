@@ -62,7 +62,8 @@ class ReviewRepository(private val reviewDao: ReviewDao) {
             .update(
                 "description", updateReview.description,
                 "rating", updateReview.rating,
-                "title", updateReview.title
+                "title", updateReview.title,
+                "imageIDs", updateReview.imageIDs,
             )
             .await()
         coroutineScope.launch(Dispatchers.IO) {
@@ -71,6 +72,7 @@ class ReviewRepository(private val reviewDao: ReviewDao) {
                 updateReview.rating,
                 updateReview.title,
                 updateReview.description,
+                updateReview.imageIDs,
             )
         }
     }

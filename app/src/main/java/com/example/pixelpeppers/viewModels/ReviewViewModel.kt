@@ -1,5 +1,6 @@
 package com.example.pixelpeppers.viewModels
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pixelpeppers.models.CreateReview
@@ -39,16 +40,24 @@ class ReviewViewModel
         }
     }
 
-    fun addReview(review: CreateReview) {
+    fun addReview(review: CreateReview, imageUris: List<Uri> = emptyList()) {
         viewModelScope.launch {
-            repository.addReview(review)
+            val ids = mutableListOf<String>()
+            for (uri in imageUris) {
+                ids.add(imageRepository.createImage(uri))
+            }
+            repository.addReview(review.copy(imageIDs = review.imageIDs + ids))
         }
     }
 
 
-    fun updateReview(reviewId: String, review: UpdateReview) {
+    fun updateReview(reviewId: String, review: UpdateReview, imageUris: List<Uri> = emptyList()) {
         viewModelScope.launch {
-            repository.updateReview(reviewId, review)
+            val ids = mutableListOf<String>()
+            for (uri in imageUris) {
+                ids.add(imageRepository.createImage(uri))
+            }
+            repository.updateReview(reviewId, review.copy(imageIDs = review.imageIDs + ids))
         }
     }
 }
