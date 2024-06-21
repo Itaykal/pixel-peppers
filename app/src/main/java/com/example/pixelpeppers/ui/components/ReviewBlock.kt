@@ -1,5 +1,6 @@
 package com.example.pixelpeppers.ui.components
 
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
@@ -11,12 +12,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,8 +48,11 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.example.pixelpeppers.models.Review
 import com.example.pixelpeppers.viewModels.GameViewModel
 import com.example.pixelpeppers.viewModels.ImageViewModel
+import com.example.pixelpeppers.viewModels.ReviewViewModel
 import com.example.pixelpeppers.viewModels.UserViewModel
 import com.google.firebase.storage.StorageReference
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -55,6 +64,7 @@ fun ReviewBlock(
     imageViewModel: ImageViewModel = hiltViewModel(),
     userViewModel: UserViewModel = hiltViewModel(),
     gameViewModel: GameViewModel = hiltViewModel(),
+    reviewViewModel: ReviewViewModel = hiltViewModel(),
 ) {
     val author by userViewModel.getUser(review.authorId).observeAsState()
     val game by gameViewModel.getGameById(review.gameId).observeAsState()
@@ -64,8 +74,9 @@ fun ReviewBlock(
     val maxLines = if (expandedState.value) 200 else minimumLineLength
 
     val imageList = remember { mutableStateListOf<StorageReference>() }
-    var authorImage = remember { mutableStateOf<StorageReference?>(null) }
+    val authorImage = remember { mutableStateOf<StorageReference?>(null) }
 
+    val deletingState = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         userViewModel.refreshUser(review.authorId)
@@ -77,7 +88,6 @@ fun ReviewBlock(
         author?.let { authorImage.value = imageViewModel.getImage(author!!.profileImageUrl) }
     }
     if (author != null && authorImage.value != null && game != null) {
-
         LaunchedEffect(Unit) {
             onFinishLoading()
         }
@@ -88,7 +98,7 @@ fun ReviewBlock(
             modifier = modifier.background(MaterialTheme.colorScheme.background)
         ) {
             Box(
-                modifier = Modifier.clip(CircleShape)
+                modifier = modifier.clip(CircleShape)
             ) {
                 GlideImage(
                     model = authorImage.value,
@@ -97,7 +107,7 @@ fun ReviewBlock(
                 )
             }
             Column(
-                modifier = Modifier.padding(end = 30.dp)
+                modifier = modifier.padding(end = 30.dp)
             ) {
                 // Rating Stars and User name
                 Row(
@@ -109,12 +119,34 @@ fun ReviewBlock(
                         color = MaterialTheme.colorScheme.onBackground,
                         style = MaterialTheme.typography.titleSmall,
                         maxLines = 1,
-                        modifier = Modifier.alpha(0.8f),
+                        modifier = modifier.alpha(0.8f),
                     )
-                    Spacer(modifier = Modifier.weight(1f))
+                    Spacer(modifier = modifier.weight(1f))
                     Rating(
-                        rating = review.rating, modifier = Modifier.alpha(0.5f)
+                        rating = review.rating, modifier = modifier.alpha(0.5f)
                     )
+                    // Edit icons
+                    if (Firebase.auth.currentUser?.uid == review.authorId) {
+                        Icon(
+                            imageVector = Icons.Outlined.Edit,
+                            contentDescription = "Edit",
+                            modifier = modifier
+                                .size(16.dp)
+                                .clickable { },
+                            tint = MaterialTheme.colorScheme.onBackground
+                        )
+                        Icon(
+                            imageVector = Icons.Outlined.Delete,
+                            contentDescription = "Delete",
+                            modifier = modifier
+                                .size(16.dp)
+                                .clickable {
+                                    deletingState.value = true
+                                    reviewViewModel.deleteReview(review.id)
+                                },
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
                 }
                 Row {
                     var reviewTitle = review.title
@@ -183,9 +215,7 @@ fun ReviewBlock(
                 }
 
                 // Review Content with read more option
-                Row(
-
-                ) {
+                Row {
                     Text(
                         text = review.description ?: "",
                         color = MaterialTheme.colorScheme.onBackground,
@@ -203,7 +233,7 @@ fun ReviewBlock(
                     Text(
                         text = if (expandedState.value) "Show Less" else "Read More",
                         color = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier
+                        modifier = modifier
                             .alpha(0.4f)
                             .clickable {
                                 expandedState.value = !expandedState.value
