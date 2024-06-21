@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Button
@@ -28,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,12 +41,13 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.example.pixelpeppers.models.Review
+import com.example.pixelpeppers.ui.components.ReviewEditDialog
 import com.example.pixelpeppers.ui.components.reviewList
 import com.example.pixelpeppers.viewModels.ImageViewModel
 import com.example.pixelpeppers.viewModels.ReviewViewModel
 import com.example.pixelpeppers.viewModels.UserViewModel
 import com.google.firebase.storage.StorageReference
-import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -53,18 +56,16 @@ fun AccountScreen(
     reviewViewModel: ReviewViewModel = hiltViewModel(),
     imageViewModel: ImageViewModel = hiltViewModel(),
 ) {
-    var userImage = remember { mutableStateOf<StorageReference?>(null) }
+    val userImage = remember { mutableStateOf<StorageReference?>(null) }
     val currentUser by userViewModel.getUser().observeAsState()
     val reviews by reviewViewModel.getReviewsByUserId(currentUser?.id).observeAsState()
+
     val editDisplayNameDialog = remember { mutableStateOf(false) }
+    val reviewToEdit = remember { mutableStateOf<Review?>(null) }
 
-    val galleryLauncher =  rememberLauncherForActivityResult(GetContent()) { imageUri ->
+    val galleryLauncher = rememberLauncherForActivityResult(GetContent()) { imageUri ->
         imageUri?.let {
-            runBlocking {
-
-            }
-            val id = imageViewModel.createImage(imageUri)
-            userViewModel.updateImage(currentUser!!.id, id)
+            userViewModel.updateImage(currentUser!!.id, imageUri)
         }
     }
 
@@ -93,7 +94,6 @@ fun AccountScreen(
             if (editDisplayNameDialog.value) {
                 val displayName = remember { mutableStateOf(currentUser!!.displayName) }
                 val isDisplayNameValid = remember { mutableStateOf(true) }
-
                 Dialog(
                     onDismissRequest = {
                         editDisplayNameDialog.value = false
@@ -142,7 +142,17 @@ fun AccountScreen(
                     }
                 }
             }
+            if (reviewToEdit.value != null) {
+                ReviewEditDialog(
+                    closeDialog = {
+                        reviewToEdit.value = null
+                    },
+                    review = reviewToEdit.value!!,
+                )
+            }
+            val listState = rememberLazyListState()
             LazyColumn(
+                state=listState,
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
@@ -206,8 +216,18 @@ fun AccountScreen(
                     )
                     Spacer(modifier = Modifier.height(30.dp))
                 }
-
-                reviewList(reviews, addGameName = true)
+                if (reviews!!.isNotEmpty()) {
+                    reviewList(
+                        reviews!!,
+                        addGameName = true,
+                        onEdit = { review ->
+                            if (currentUser!!.id == review.authorId) {
+                                reviewToEdit.value = review
+                            }
+                        },
+                        editable = true,
+                    )
+                }
 
                 item {
                     Spacer(modifier = Modifier.height(50.dp))

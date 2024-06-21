@@ -37,12 +37,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.pixelpeppers.R
 import com.example.pixelpeppers.models.ImageSize
+import com.example.pixelpeppers.models.Review
 import com.example.pixelpeppers.ui.components.GamePreview
 import com.example.pixelpeppers.ui.components.GenreTag
 import com.example.pixelpeppers.ui.components.ReviewDialog
+import com.example.pixelpeppers.ui.components.ReviewEditDialog
 import com.example.pixelpeppers.ui.components.reviewList
 import com.example.pixelpeppers.viewModels.GameViewModel
 import com.example.pixelpeppers.viewModels.ReviewViewModel
+import com.example.pixelpeppers.viewModels.UserViewModel
 
 @Composable
 fun GamePage(
@@ -50,8 +53,10 @@ fun GamePage(
     gameID: Int = 17000,
     gameViewModel: GameViewModel = hiltViewModel(),
     reviewViewModel: ReviewViewModel = hiltViewModel(),
-) {
+    userViewModel: UserViewModel = hiltViewModel(),
+    ) {
     val showReviewDialog = remember { mutableStateOf(false) }
+    val currentUser by userViewModel.getUser().observeAsState()
     val lazyListState = rememberLazyListState()
 
     val firstItemTranslationY by remember {
@@ -91,15 +96,19 @@ fun GamePage(
         LaunchedEffect(Unit) {
             gameViewModel.refreshGamesByID(gameID)
             reviewViewModel.refreshReviewsByGameId(gameID)
+            userViewModel.refreshUser()
         }
-        if (game == null || reviews == null) {
+        if (game == null || reviews == null || currentUser == null) {
             LoadingAnimation()
         } else {
             val gameRes = game!!
 
             if (showReviewDialog.value) {
                 ReviewDialog(
-                    closeDialog = {
+                    onDismiss = {
+                        showReviewDialog.value = false
+                    },
+                    onSubmit = {
                         showReviewDialog.value = false
                     },
                     gameID = gameID
@@ -180,7 +189,10 @@ fun GamePage(
                             }
                         }
                     }
-                    reviewList(reviews)
+                    reviewList(
+                        reviews!!,
+                        editable = false,
+                    )
                 }
                 FloatingActionButton(
                     onClick = {

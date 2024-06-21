@@ -5,5 +5,5 @@ data class CreateReview (
     val title: String,
     val description: String? = null,
     val gameId: Int,
-    val imageIDs: List<String>? = null,
+    val imageIDs: List<String> = emptyList(),
 )

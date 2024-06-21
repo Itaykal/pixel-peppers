@@ -25,8 +25,15 @@ interface ReviewDao {
         "UPDATE reviews SET " +
                 "rating = :rating, " +
                 "title = :title, " +
-                "description = :description " +
+                "description = :description, " +
+                "image_ids = :imageIDs " +
                 "WHERE id = :reviewId"
     )
-    fun updateReview(reviewId: String, rating: Int, title: String, description: String?)
+    fun updateReview(
+        reviewId: String,
+        rating: Int,
+        title: String,
+        description: String?,
+        imageIDs: List<String>,
+    )
 }

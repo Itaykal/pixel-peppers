@@ -17,6 +17,10 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,7 +46,10 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.example.pixelpeppers.models.Review
 import com.example.pixelpeppers.viewModels.GameViewModel
 import com.example.pixelpeppers.viewModels.ImageViewModel
+import com.example.pixelpeppers.viewModels.ReviewViewModel
 import com.example.pixelpeppers.viewModels.UserViewModel
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.google.firebase.storage.StorageReference
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -51,10 +58,13 @@ fun ReviewBlock(
     review: Review,
     modifier: Modifier = Modifier,
     onFinishLoading: () -> Unit = {},
+    onEdit: (Review) -> Unit = {},
+    editable: Boolean = false,
     addGameName: Boolean = false,
     imageViewModel: ImageViewModel = hiltViewModel(),
     userViewModel: UserViewModel = hiltViewModel(),
     gameViewModel: GameViewModel = hiltViewModel(),
+    reviewViewModel: ReviewViewModel = hiltViewModel(),
 ) {
     val author by userViewModel.getUser(review.authorId).observeAsState()
     val game by gameViewModel.getGameById(review.gameId).observeAsState()
@@ -64,12 +74,15 @@ fun ReviewBlock(
     val maxLines = if (expandedState.value) 200 else minimumLineLength
 
     val imageList = remember { mutableStateListOf<StorageReference>() }
-    var authorImage = remember { mutableStateOf<StorageReference?>(null) }
-
+    val authorImage = remember { mutableStateOf<StorageReference?>(null) }
 
     LaunchedEffect(Unit) {
         userViewModel.refreshUser(review.authorId)
         gameViewModel.refreshGamesByID(review.gameId)
+    }
+
+    LaunchedEffect(review.imageIDs) {
+        imageList.clear()
         imageList.addAll(imageViewModel.getReviewImages(review))
     }
 
@@ -77,7 +90,6 @@ fun ReviewBlock(
         author?.let { authorImage.value = imageViewModel.getImage(author!!.profileImageUrl) }
     }
     if (author != null && authorImage.value != null && game != null) {
-
         LaunchedEffect(Unit) {
             onFinishLoading()
         }
@@ -88,7 +100,7 @@ fun ReviewBlock(
             modifier = modifier.background(MaterialTheme.colorScheme.background)
         ) {
             Box(
-                modifier = Modifier.clip(CircleShape)
+                modifier = modifier.clip(CircleShape)
             ) {
                 GlideImage(
                     model = authorImage.value,
@@ -97,7 +109,7 @@ fun ReviewBlock(
                 )
             }
             Column(
-                modifier = Modifier.padding(end = 30.dp)
+                modifier = modifier.padding(end = 30.dp)
             ) {
                 // Rating Stars and User name
                 Row(
@@ -109,12 +121,35 @@ fun ReviewBlock(
                         color = MaterialTheme.colorScheme.onBackground,
                         style = MaterialTheme.typography.titleSmall,
                         maxLines = 1,
-                        modifier = Modifier.alpha(0.8f),
+                        modifier = modifier.alpha(0.8f),
                     )
-                    Spacer(modifier = Modifier.weight(1f))
+                    Spacer(modifier = modifier.weight(1f))
                     Rating(
-                        rating = review.rating, modifier = Modifier.alpha(0.5f)
+                        rating = review.rating, modifier = modifier.alpha(0.5f)
                     )
+                    // Edit icons
+                    if (editable && Firebase.auth.currentUser?.uid == review.authorId) {
+                        Icon(
+                            imageVector = Icons.Outlined.Edit,
+                            contentDescription = "Edit",
+                            modifier = modifier
+                                .size(16.dp)
+                                .clickable {
+                                    onEdit(review)
+                                },
+                            tint = MaterialTheme.colorScheme.onBackground
+                        )
+                        Icon(
+                            imageVector = Icons.Outlined.Delete,
+                            contentDescription = "Delete",
+                            modifier = modifier
+                                .size(16.dp)
+                                .clickable {
+                                    reviewViewModel.deleteReview(review.id)
+                                },
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
                 }
                 Row {
                     var reviewTitle = review.title
@@ -145,7 +180,7 @@ fun ReviewBlock(
                             .fillMaxWidth()
                             .padding(top = 10.dp, bottom = 10.dp),
                     ) {
-                        items(imageList) { image ->
+                        items(imageList, key= { it.name }) { image ->
                             GlideImage(
                                 model = image,
                                 contentDescription = "",
@@ -170,7 +205,7 @@ fun ReviewBlock(
                             zoomedImage.value = null
                         }) {
                             GlideImage(
-                               model = zoomedImage.value,
+                                model = zoomedImage.value,
                                 contentDescription = "",
                                 modifier = Modifier
                                     .size(300.dp)
@@ -183,9 +218,7 @@ fun ReviewBlock(
                 }
 
                 // Review Content with read more option
-                Row(
-
-                ) {
+                Row {
                     Text(
                         text = review.description ?: "",
                         color = MaterialTheme.colorScheme.onBackground,
@@ -203,7 +236,7 @@ fun ReviewBlock(
                     Text(
                         text = if (expandedState.value) "Show Less" else "Read More",
                         color = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier
+                        modifier = modifier
                             .alpha(0.4f)
                             .clickable {
                                 expandedState.value = !expandedState.value
