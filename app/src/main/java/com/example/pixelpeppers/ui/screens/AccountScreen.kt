@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -52,6 +53,7 @@ import com.google.firebase.storage.StorageReference
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun AccountScreen(
+    routeToLogin: () -> Unit,
     userViewModel: UserViewModel = hiltViewModel(),
     reviewViewModel: ReviewViewModel = hiltViewModel(),
     imageViewModel: ImageViewModel = hiltViewModel(),
@@ -160,7 +162,22 @@ fun AccountScreen(
                     .padding(top = 30.dp, bottom = 30.dp, start = 10.dp, end = 10.dp)
             ) {
                 item {
-                    Spacer(modifier = Modifier.height(70.dp))
+                    Box(
+                        modifier = Modifier
+                            .height(70.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Logout",
+                            color = MaterialTheme.colorScheme.errorContainer,
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .clickable {
+                                    userViewModel.logout()
+                                    routeToLogin()
+                                }
+                        )
+                    }
                 }
                 item {
                     Box {

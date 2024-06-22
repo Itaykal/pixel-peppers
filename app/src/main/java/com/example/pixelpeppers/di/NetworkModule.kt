@@ -33,9 +33,10 @@ object NetworkModule {
     @Singleton
     @Provides
     fun provideUserClient(
-        okHttpClient: OkHttpClient
+        okHttpClient: OkHttpClient,
+        dataCoordinator: DataCoordinator
     ): UserClient {
-        return UserClient(okHttpClient)
+        return UserClient(okHttpClient, dataCoordinator)
     }
 
     @Provides

@@ -3,6 +3,7 @@ package com.example.pixelpeppers.viewModels
 import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pixelpeppers.models.User
@@ -27,8 +28,11 @@ class UserViewModel @Inject constructor(
         userRepository.loginWithCode(code)
     }
 
-    fun getUser(id: String? = null): LiveData<User> {
+    fun getUser(id: String? = null): LiveData<User?> {
         if (id == null) {
+            if (Firebase.auth.currentUser == null) {
+                return MutableLiveData(null)
+            }
             return userRepository.getUser(Firebase.auth.currentUser!!.uid)
         }
         return userRepository.getUser(id)
@@ -60,6 +64,12 @@ class UserViewModel @Inject constructor(
     fun updateDisplayName(id: String, displayName: String) {
         viewModelScope.launch {
             userRepository.updateDisplayName(id, displayName)
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            userRepository.logout()
         }
     }
 }

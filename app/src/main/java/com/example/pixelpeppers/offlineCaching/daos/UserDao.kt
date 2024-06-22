@@ -10,7 +10,7 @@ import com.example.pixelpeppers.models.User
 @Dao
 interface UserDao {
     @Query("select * from users where id = :id limit 1")
-    fun getUser(id: String): LiveData<User>
+    fun getUser(id: String): LiveData<User?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(user: User)
@@ -23,4 +23,7 @@ interface UserDao {
 
      @Query("update users set display_name = :displayName where id = :id")
      fun updateDisplayName(id: String, displayName: String)
+
+     @Query("delete from users")
+     fun deleteAll()
 }
