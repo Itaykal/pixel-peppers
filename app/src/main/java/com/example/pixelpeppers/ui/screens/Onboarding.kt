@@ -34,15 +34,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.pixelpeppers.models.Cover
 import com.example.pixelpeppers.models.Game
 import com.example.pixelpeppers.models.Genre
-import com.example.pixelpeppers.models.UpdateUser
 import com.example.pixelpeppers.ui.components.GameCarousell
 import com.example.pixelpeppers.ui.components.GenreTag
 import com.example.pixelpeppers.ui.components.PageIndicator
 import com.example.pixelpeppers.ui.components.PixelPeppersButton
 import com.example.pixelpeppers.viewModels.GenreViewModel
 import com.example.pixelpeppers.viewModels.UserViewModel
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 
 var g = Game(
     id = 17000,
@@ -79,34 +76,38 @@ fun Onboarding(
         navigateToMenu()
         userViewModel.updateOnBoarding(user!!.id, true)
     } else {
-        Scaffold(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(0.dp)
-        ) { paddingValues ->
-            Box(
-                contentAlignment = Alignment.TopCenter,
+        if (user!!.onboardingComplete) {
+            navigateToMenu()
+        } else {
+            Scaffold(
                 modifier = modifier
-            ) {
-                PageIndicator(totalPages = 2, currentPage = page.value)
-                PixelPeppersButton(
-                    text = "Next",
-                    onClick = {
-                        page.value++
-                    })
-                if (page.value == 0) {
-                    OnboardingIntro(
-                        modifier = modifier
-                            .padding(paddingValues)
-                            .fillMaxSize(),
-                    )
-                } else if (page.value == 1) {
-                    OnboardingTags(
-                        modifier = modifier
-                            .padding(paddingValues)
-                            .fillMaxSize(),
-                        genreViewModel = genreViewModel
-                    )
+                    .fillMaxSize()
+                    .padding(0.dp)
+            ) { paddingValues ->
+                Box(
+                    contentAlignment = Alignment.TopCenter,
+                    modifier = modifier
+                ) {
+                    PageIndicator(totalPages = 2, currentPage = page.value)
+                    PixelPeppersButton(
+                        text = "Next",
+                        onClick = {
+                            page.value++
+                        })
+                    if (page.value == 0) {
+                        OnboardingIntro(
+                            modifier = modifier
+                                .padding(paddingValues)
+                                .fillMaxSize(),
+                        )
+                    } else if (page.value == 1) {
+                        OnboardingTags(
+                            modifier = modifier
+                                .padding(paddingValues)
+                                .fillMaxSize(),
+                            genreViewModel = genreViewModel
+                        )
+                    }
                 }
             }
         }

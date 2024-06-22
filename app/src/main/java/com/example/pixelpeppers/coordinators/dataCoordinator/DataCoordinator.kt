@@ -7,7 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class DataCoordinator private constructor() {
+class DataCoordinator {
     companion object
     {
         val instance: DataCoordinator by lazy(LazyThreadSafetyMode.SYNCHRONIZED) { DataCoordinator() }
@@ -28,14 +28,10 @@ class DataCoordinator private constructor() {
     @OptIn(DelicateCoroutinesApi::class)
     fun initialize(context: Context, onLoad: () -> Unit = {}) {
         GlobalScope.launch(Dispatchers.Default) {
-            initializeAsync(context)
+            this@DataCoordinator.context = context
+            accessToken = getAccessToken()
+            accessTokenExpirationTime = getAccessTokenExpirationTime()
             onLoad()
         }
-    }
-
-    suspend fun initializeAsync(context: Context) {
-        this.context = context
-        accessToken = getAccessToken()
-        accessTokenExpirationTime = getAccessTokenExpirationTime()
     }
 }

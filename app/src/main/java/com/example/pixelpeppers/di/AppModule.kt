@@ -3,6 +3,7 @@ package com.example.pixelpeppers.di
 
 import com.example.pixelpeppers.clients.GameClient
 import com.example.pixelpeppers.clients.UserClient
+import com.example.pixelpeppers.coordinators.dataCoordinator.DataCoordinator
 import com.example.pixelpeppers.offlineCaching.daos.GameDao
 import com.example.pixelpeppers.offlineCaching.daos.GenreDao
 import com.example.pixelpeppers.offlineCaching.daos.ReviewDao
@@ -51,6 +52,12 @@ object AppModule {
     @Provides
     fun provideGameRepository(gameDao: GameDao, gson: Gson, gameClient: GameClient): GameRepository {
         return GameRepository(gameDao, gson, gameClient)
+    }
+
+    @Singleton
+    @Provides
+    fun provideDataCoordinator(): DataCoordinator {
+        return DataCoordinator()
     }
 
 }

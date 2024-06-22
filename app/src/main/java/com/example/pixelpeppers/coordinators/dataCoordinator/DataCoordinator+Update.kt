@@ -20,3 +20,10 @@ fun DataCoordinator.updateTokenExpires(expiresIn: Int) {
         setAccessTokenExpirationTime(expirationTime)
     }
 }
+
+@OptIn(DelicateCoroutinesApi::class)
+fun DataCoordinator.clearData() {
+    GlobalScope.launch(Dispatchers.Default) {
+        clearAll()
+    }
+}

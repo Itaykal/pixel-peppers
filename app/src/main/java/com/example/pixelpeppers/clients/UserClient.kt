@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import com.example.pixelpeppers.coordinators.dataCoordinator.DataCoordinator
+import com.example.pixelpeppers.coordinators.dataCoordinator.clearAll
+import com.example.pixelpeppers.coordinators.dataCoordinator.clearData
 import com.example.pixelpeppers.coordinators.dataCoordinator.updateAccessToken
 import com.example.pixelpeppers.coordinators.dataCoordinator.updateTokenExpires
 import com.example.pixelpeppers.extensions.await
@@ -22,7 +24,10 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 
 
-class UserClient(private val okHttpClient: OkHttpClient) {
+class UserClient(
+    private val okHttpClient: OkHttpClient,
+    private val dataCoordinator: DataCoordinator,
+) {
 
     companion object {
         private const val USERS_COLLECTION = "users"
@@ -80,8 +85,8 @@ class UserClient(private val okHttpClient: OkHttpClient) {
             .call()
             .await()
         val accessTokenResponse = AccessTokenResponse.fromMap(result.data as HashMap<*, *>)
-        DataCoordinator.instance.updateAccessToken(accessTokenResponse.accessToken)
-        DataCoordinator.instance.updateTokenExpires(accessTokenResponse.expiresIn)
+        dataCoordinator.updateAccessToken(accessTokenResponse.accessToken)
+        dataCoordinator.updateTokenExpires(accessTokenResponse.expiresIn)
         accessTokenResponse
     }
 
@@ -91,5 +96,10 @@ class UserClient(private val okHttpClient: OkHttpClient) {
             .update(
                 updateUser.toMap()
             ).await()
+    }
+
+    suspend fun logout() {
+        dataCoordinator.clearAll()
+        auth.signOut()
     }
 }

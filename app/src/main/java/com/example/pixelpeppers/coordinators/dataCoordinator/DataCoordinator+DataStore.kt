@@ -30,3 +30,10 @@ suspend fun DataCoordinator.getAccessTokenExpirationTime(): Long {
     return context.dataStore.data.firstOrNull()?.get(PreferencesKeys.accessTokenExpirationTime)
         ?: defaultAccessTokenExpirationTimeValue
 }
+
+suspend fun DataCoordinator.clearAll() {
+    val context = this.context ?: return
+    context.dataStore.edit { preferences ->
+        preferences.clear()
+    }
+}

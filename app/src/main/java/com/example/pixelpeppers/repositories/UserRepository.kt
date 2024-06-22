@@ -3,6 +3,7 @@ package com.example.pixelpeppers.repositories
 import android.content.Context
 import androidx.lifecycle.LiveData
 import com.example.pixelpeppers.clients.UserClient
+import com.example.pixelpeppers.coordinators.dataCoordinator.DataCoordinator
 import com.example.pixelpeppers.models.UpdateUser
 import com.example.pixelpeppers.models.User
 import com.example.pixelpeppers.offlineCaching.daos.UserDao
@@ -20,7 +21,7 @@ class UserRepository(
         userClient.startTwitchAuthActivity(context)
     }
 
-    fun getUser(id: String): LiveData<User> {
+    fun getUser(id: String): LiveData<User?> {
         return userDao.getUser(id)
     }
 
@@ -66,5 +67,12 @@ class UserRepository(
             userDao.updateDisplayName(id, displayName)
         }
 
+    }
+
+    suspend fun logout() {
+        coroutineScope.launch(Dispatchers.IO) {
+            userClient.logout()
+            userDao.deleteAll()
+        }
     }
 }

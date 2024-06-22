@@ -55,7 +55,9 @@ fun NavGraph(
         composable(
             route = Route.Account.route
         ) {
-            AccountScreen()
+            AccountScreen(
+                routeToLogin = {navController.navigate(route = Route.Login.route)},
+            )
         }
     }
 }
